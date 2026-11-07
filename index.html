@@ -1,1 +1,889 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clash of Clans Portal | Clan Command & Armory</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              gold: '#F59E0B',
+              darkgold: '#D97706',
+              surface: '#0F172A',
+              card: '#1E293B',
+              border: '#334155',
+              accent: '#EF4444'
+            }
+          }
+        }
+      }
+    }
+  </script>
 
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase JS SDK v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* Custom scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-amber-500 selection:text-black">
+
+  <!-- Top Announcement / Environment Setup Bar -->
+  <div id="envBanner" class="bg-amber-600/20 border-b border-amber-500/30 px-4 py-2 text-xs flex justify-between items-center text-amber-200">
+    <div class="flex items-center gap-2">
+      <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
+      <span id="envStatusText">Supabase Not Connected: Connect to enable live auth, realtime chat, and store features.</span>
+    </div>
+    <button onclick="openConfigModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1 rounded transition">
+      Configure Connection
+    </button>
+  </div>
+
+  <!-- Primary Navigation -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/20">
+          <i data-lucide="swords" class="w-6 h-6 text-slate-950"></i>
+        </div>
+        <div>
+          <span class="font-extrabold tracking-wider text-lg uppercase bg-gradient-to-r from-amber-400 to-amber-200 bg-clip-text text-transparent">Clash Hub</span>
+          <span class="text-[10px] block text-slate-400 tracking-widest font-mono">VALHALLA VANGUARD</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800 text-sm">
+        <button onclick="switchTab('recruitment')" id="tab-recruitment" class="tab-btn px-4 py-1.5 rounded-lg font-medium transition text-amber-400 bg-slate-800">Recruitment</button>
+        <button onclick="switchTab('armory')" id="tab-armory" class="tab-btn px-4 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">Clan Armory</button>
+        <button onclick="switchTab('war-council')" id="tab-war-council" class="tab-btn px-4 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">War Council (Chat)</button>
+        <button onclick="switchTab('admin-hq')" id="tab-admin-hq" class="tab-btn px-4 py-1.5 rounded-lg font-medium transition text-slate-400 hover:text-white">Leadership HQ</button>
+      </nav>
+
+      <!-- User & Cart Controls -->
+      <div class="flex items-center gap-3">
+        <button onclick="toggleCartDrawer()" class="relative p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+          <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+          <span id="cartCount" class="absolute -top-1 -right-1 bg-amber-500 text-slate-950 font-bold rounded-full w-5 h-5 text-xs flex items-center justify-center">0</span>
+        </button>
+
+        <div id="authNavWrapper">
+          <button onclick="openAuthModal('signin')" class="text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg transition border border-slate-700">
+            Sign In
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Viewport -->
+  <main class="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6">
+    
+    <!-- SECTION 1: RECRUITMENT PETITION -->
+    <section id="view-recruitment" class="view-panel space-y-6">
+      <div class="bg-gradient-to-r from-slate-900 to-slate-900/60 border border-slate-800 p-8 rounded-2xl relative overflow-hidden">
+        <div class="max-w-2xl relative z-10">
+          <span class="text-amber-400 font-semibold tracking-wider text-xs uppercase">Official Recruitment</span>
+          <h1 class="text-3xl font-extrabold tracking-tight mt-1 text-white">Enlist in the Valhalla Vanguard</h1>
+          <p class="text-slate-400 text-sm mt-2 leading-relaxed">
+            All chieftains must undergo validation by the High Council. Submit your war credentials, player tag, and combat specialty.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+          <h2 class="text-lg font-bold flex items-center gap-2 mb-4">
+            <i data-lucide="file-badge" class="w-5 h-5 text-amber-400"></i> Join Request Application
+          </h2>
+          <form id="joinRequestForm" onsubmit="handleJoinRequest(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">In-Game Name (IGN) *</label>
+                <input required id="req-ign" type="text" placeholder="e.g. Chief Valkyrie" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Player Tag *</label>
+                <input required id="req-tag" type="text" placeholder="#98YVC0L2" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm uppercase focus:outline-none focus:border-amber-500">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Town Hall Level *</label>
+                <select id="req-th" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
+                  <option value="16">Town Hall 16</option>
+                  <option value="15">Town Hall 15</option>
+                  <option value="14">Town Hall 14</option>
+                  <option value="13">Town Hall 13</option>
+                  <option value="12">Town Hall 12</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">War Stars Count *</label>
+                <input required id="req-stars" type="number" min="0" placeholder="1250" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Preferred War Role</label>
+                <select id="req-spec" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
+                  <option value="Electro Titan / Smash">Smash Specialist</option>
+                  <option value="Lalo / Air Attack">Lalo / Air</option>
+                  <option value="Super Bowler Walk">Queen Charge Specialist</option>
+                  <option value="Cleanup / Safe 2-Star">Cleanup / Tactician</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1">Statement to Leadership</label>
+              <textarea id="req-msg" rows="3" placeholder="Tell our elders about your regular active hours and war experience..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500"></textarea>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 rounded-lg font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition flex items-center justify-center gap-2">
+              <i data-lucide="send" class="w-4 h-4"></i> Dispatch Petition to Leadership
+            </button>
+          </form>
+        </div>
+
+        <!-- Verification Criteria -->
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Minimum Requirements</h3>
+          <ul class="text-xs space-y-3 text-slate-400">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+              Town Hall 14+ with max offense heroes.
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+              Both Clan War attacks mandatory within the first 18 hours.
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+              Must participate actively in the live War Council group chat.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: CLAN ARMORY (E-COMMERCE) -->
+    <section id="view-armory" class="view-panel hidden space-y-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">Clan Armory & Supply Depo</h2>
+          <p class="text-slate-400 text-sm">Official clan jerseys, mousepads, keychains, and 3D printed artifacts.</p>
+        </div>
+        <button onclick="seedSampleMerchandise()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700">
+          Seed Database Items
+        </button>
+      </div>
+
+      <div id="armoryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Injected via JavaScript from Supabase -->
+      </div>
+    </section>
+
+    <!-- SECTION 3: WAR COUNCIL (REALTIME GROUP CHAT) -->
+    <section id="view-war-council" class="view-panel hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl h-[calc(100vh-14rem)] flex overflow-hidden">
+        
+        <!-- Channels Sidebar -->
+        <div class="w-64 border-r border-slate-800 flex flex-col bg-slate-950/60">
+          <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Rooms & War Tables</span>
+            <button onclick="promptCreateRoom()" class="p-1 hover:bg-slate-800 rounded text-slate-300" title="Create Room">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div id="roomList" class="flex-1 overflow-y-auto p-2 space-y-1">
+            <!-- Populated via database -->
+          </div>
+        </div>
+
+        <!-- Chat Canvas -->
+        <div class="flex-1 flex flex-col bg-slate-900">
+          <!-- Room Header -->
+          <div class="px-6 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+            <div>
+              <h3 id="currentRoomTitle" class="font-bold text-white flex items-center gap-2">
+                <i data-lucide="hash" class="w-4 h-4 text-amber-400"></i> general-strategy
+              </h3>
+              <p id="currentRoomDesc" class="text-xs text-slate-400">Public War Discussion</p>
+            </div>
+            <div id="chatAuthWarning" class="text-xs text-rose-400 font-medium"></div>
+          </div>
+
+          <!-- Messages Scroller -->
+          <div id="messagesContainer" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Messages stream here -->
+          </div>
+
+          <!-- Chat Input -->
+          <form id="chatForm" onsubmit="handleSendMessage(event)" class="p-4 border-t border-slate-800 bg-slate-950/80 flex gap-2">
+            <input id="chatInput" type="text" placeholder="Authenticate to send orders..." class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" disabled>
+            <button id="chatSendBtn" type="submit" class="bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 px-5 rounded-lg font-bold flex items-center gap-1 transition" disabled>
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: LEADERSHIP HQ (ADMIN REVIEW) -->
+    <section id="view-admin-hq" class="view-panel hidden space-y-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-2xl font-bold">Officer Control Terminal</h2>
+          <p class="text-slate-400 text-sm">Review, approve, or decline prospective member petitions.</p>
+        </div>
+        <button onclick="loadJoinRequests()" class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg border border-slate-700">
+          Refresh Queue
+        </button>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-950 border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider">
+            <tr>
+              <th class="p-4">Applicant</th>
+              <th class="p-4">Town Hall</th>
+              <th class="p-4">War Stars</th>
+              <th class="p-4">Specialty</th>
+              <th class="p-4">Status</th>
+              <th class="p-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminRequestsTableBody" class="divide-y divide-slate-800">
+            <!-- Loaded dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Slide-over Cart Drawer -->
+  <div id="cartDrawer" class="fixed inset-y-0 right-0 w-96 bg-slate-900 border-l border-slate-800 transform translate-x-full transition-transform duration-300 z-50 flex flex-col shadow-2xl">
+    <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+      <h3 class="font-bold flex items-center gap-2">
+        <i data-lucide="shopping-bag" class="w-4 h-4 text-amber-400"></i> Armory Cart
+      </h3>
+      <button onclick="toggleCartDrawer()" class="p-1 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <div id="cartItemList" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- Injected -->
+    </div>
+    <div class="p-4 border-t border-slate-800 bg-slate-950/60 space-y-3">
+      <div class="flex justify-between font-bold">
+        <span>Total:</span>
+        <span id="cartSubtotal">$0.00</span>
+      </div>
+      <button onclick="checkoutCart()" class="w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition">
+        Confirm Requisition
+      </button>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 id="authModalTitle" class="text-xl font-bold mb-1">Sign In to Clan Portal</h3>
+      <p class="text-xs text-slate-400 mb-6">Authenticate via your Supabase account to access real-time channels.</p>
+
+      <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Email</label>
+          <input required id="authEmail" type="email" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
+          <input required id="authPassword" type="password" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
+        </div>
+        <div id="authUsernameGroup" class="hidden">
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Clan Handle / IGN</label>
+          <input id="authUsername" type="text" placeholder="ChiefBarbarian" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500">
+        </div>
+
+        <button type="submit" id="authSubmitBtn" class="w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition">
+          Sign In
+        </button>
+      </form>
+
+      <div class="mt-4 text-center text-xs text-slate-400">
+        <span id="authToggleText">Need an account?</span>
+        <button onclick="toggleAuthMode()" id="authToggleBtn" class="text-amber-400 font-semibold underline ml-1">Sign Up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPABASE CONFIG MODAL -->
+  <div id="configModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-6 shadow-2xl relative">
+      <button onclick="closeConfigModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="text-xl font-bold mb-1">Dynamic Supabase Gateway</h3>
+      <p class="text-xs text-slate-400 mb-4">Input your project credentials. Credentials persist locally in your browser session.</p>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">SUPABASE_URL</label>
+          <input id="cfgUrl" type="url" placeholder="https://xyz.supabase.co" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500 font-mono">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">SUPABASE_ANON_KEY</label>
+          <input id="cfgAnon" type="password" placeholder="eyJhbGciOi..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500 font-mono">
+        </div>
+
+        <button onclick="saveSupabaseConfig()" class="w-full py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition">
+          Save & Initialize Client
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC -->
+  <script>
+    // State management
+    let supabase = null;
+    let currentUser = null;
+    let currentProfile = null;
+    let currentRoomId = null;
+    let chatChannel = null;
+    let cart = [];
+    let isSignUpMode = false;
+
+    // Initialize application on DOM load
+    window.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      initSupabaseFromStorage();
+    });
+
+    // 1. Supabase Initialization
+    function initSupabaseFromStorage() {
+      const url = localStorage.getItem('COC_SUPABASE_URL');
+      const anonKey = localStorage.getItem('COC_SUPABASE_ANON_KEY');
+
+      if (url && anonKey) {
+        supabase = window.supabase.createClient(url, anonKey);
+        document.getElementById('envStatusText').innerText = `Supabase Connected: ${new URL(url).hostname}`;
+        document.getElementById('envBanner').classList.remove('bg-amber-600/20', 'border-amber-500/30');
+        document.getElementById('envBanner').classList.add('bg-emerald-600/20', 'border-emerald-500/30', 'text-emerald-300');
+        
+        checkSession();
+        loadArmoryCatalog();
+        loadChatRooms();
+        loadJoinRequests();
+      } else {
+        document.getElementById('envStatusText').innerText = "Supabase Not Connected: Configure to activate realtime & database features.";
+      }
+    }
+
+    function saveSupabaseConfig() {
+      const url = document.getElementById('cfgUrl').value.trim();
+      const anon = document.getElementById('cfgAnon').value.trim();
+      if (!url || !anon) return alert('Provide both URL and Anon key.');
+
+      localStorage.setItem('COC_SUPABASE_URL', url);
+      localStorage.setItem('COC_SUPABASE_ANON_KEY', anon);
+      closeConfigModal();
+      initSupabaseFromStorage();
+    }
+
+    function openConfigModal() {
+      document.getElementById('cfgUrl').value = localStorage.getItem('COC_SUPABASE_URL') || '';
+      document.getElementById('cfgAnon').value = localStorage.getItem('COC_SUPABASE_ANON_KEY') || '';
+      document.getElementById('configModal').classList.remove('hidden');
+      document.getElementById('configModal').classList.add('flex');
+    }
+    function closeConfigModal() {
+      document.getElementById('configModal').classList.add('hidden');
+      document.getElementById('configModal').classList.remove('flex');
+    }
+
+    // 2. Authentication Flow
+    async function checkSession() {
+      if (!supabase) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      handleSessionChange(session);
+
+      supabase.auth.onAuthStateChange((_event, session) => {
+        handleSessionChange(session);
+      });
+    }
+
+    async function handleSessionChange(session) {
+      const wrapper = document.getElementById('authNavWrapper');
+      const chatInput = document.getElementById('chatInput');
+      const chatSendBtn = document.getElementById('chatSendBtn');
+      const chatWarning = document.getElementById('chatAuthWarning');
+
+      if (session?.user) {
+        currentUser = session.user;
+        // Fetch public profile
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', currentUser.id)
+          .single();
+        currentProfile = profile;
+
+        wrapper.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <span class="block text-xs font-bold text-white">${profile?.username || currentUser.email.split('@')[0]}</span>
+              <span class="block text-[10px] text-amber-400 uppercase">${profile?.role || 'Member'}</span>
+            </div>
+            <button onclick="signOutUser()" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        chatInput.disabled = false;
+        chatSendBtn.disabled = false;
+        chatInput.placeholder = "Broadcast war commands...";
+        chatWarning.innerText = "";
+      } else {
+        currentUser = null;
+        currentProfile = null;
+        wrapper.innerHTML = `
+          <button onclick="openAuthModal('signin')" class="text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg transition border border-slate-700">
+            Sign In
+          </button>
+        `;
+        chatInput.disabled = true;
+        chatSendBtn.disabled = true;
+        chatInput.placeholder = "Authenticate to join room chat...";
+        chatWarning.innerText = "Read-only mode. Please sign in to message.";
+      }
+      lucide.createIcons();
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      if (!supabase) return alert("Configure Supabase credentials first.");
+
+      const email = document.getElementById('authEmail').value;
+      const password = document.getElementById('authPassword').value;
+      const username = document.getElementById('authUsername').value;
+
+      if (isSignUpMode) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { username: username || email.split('@')[0] } }
+        });
+        if (error) alert(error.message);
+        else {
+          alert("Account registered successfully! You may now sign in.");
+          toggleAuthMode();
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) alert(error.message);
+        else closeAuthModal();
+      }
+    }
+
+    async function signOutUser() {
+      if (supabase) await supabase.auth.signOut();
+    }
+
+    function openAuthModal(mode = 'signin') {
+      isSignUpMode = mode === 'signup';
+      renderAuthModal();
+      document.getElementById('authModal').classList.remove('hidden');
+      document.getElementById('authModal').classList.add('flex');
+    }
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+      document.getElementById('authModal').classList.remove('flex');
+    }
+    function toggleAuthMode() {
+      isSignUpMode = !isSignUpMode;
+      renderAuthModal();
+    }
+    function renderAuthModal() {
+      document.getElementById('authModalTitle').innerText = isSignUpMode ? "Create Clan Account" : "Sign In to Clan Portal";
+      document.getElementById('authSubmitBtn').innerText = isSignUpMode ? "Register Account" : "Sign In";
+      document.getElementById('authToggleText').innerText = isSignUpMode ? "Already registered?" : "Need an account?";
+      document.getElementById('authToggleBtn').innerText = isSignUpMode ? "Sign In" : "Sign Up";
+      document.getElementById('authUsernameGroup').classList.toggle('hidden', !isSignUpMode);
+    }
+
+    // 3. Tab Routing
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('text-amber-400', 'bg-slate-800');
+        btn.classList.add('text-slate-400');
+      });
+
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      activeBtn.classList.add('text-amber-400', 'bg-slate-800');
+      activeBtn.classList.remove('text-slate-400');
+    }
+
+    // 4. Recruitment Workflow
+    async function handleJoinRequest(e) {
+      e.preventDefault();
+      if (!supabase) return alert("Supabase is not configured.");
+
+      const payload = {
+        ign: document.getElementById('req-ign').value,
+        player_tag: document.getElementById('req-tag').value,
+        town_hall: parseInt(document.getElementById('req-th').value),
+        war_stars: parseInt(document.getElementById('req-stars').value),
+        specialty: document.getElementById('req-spec').value,
+        statement: document.getElementById('req-msg').value,
+        status: 'pending'
+      };
+
+      const { error } = await supabase.from('join_requests').insert([payload]);
+      if (error) {
+        alert("Failed to submit petition: " + error.message);
+      } else {
+        alert("Petition submitted successfully! Our Elders will evaluate your profile.");
+        document.getElementById('joinRequestForm').reset();
+        loadJoinRequests();
+      }
+    }
+
+    async function loadJoinRequests() {
+      if (!supabase) return;
+      const { data, error } = await supabase
+        .from('join_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) return console.error(error);
+      const tbody = document.getElementById('adminRequestsTableBody');
+      tbody.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No applications in queue.</td></tr>`;
+        return;
+      }
+
+      data.forEach(req => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-950/40";
+        tr.innerHTML = `
+          <td class="p-4 font-medium text-white">${req.ign} <span class="block text-xs font-mono text-slate-400">${req.player_tag}</span></td>
+          <td class="p-4">TH${req.town_hall}</td>
+          <td class="p-4 text-amber-400 font-semibold">${req.war_stars}</td>
+          <td class="p-4 text-xs text-slate-300">${req.specialty}</td>
+          <td class="p-4">
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold ${
+              req.status === 'approved' ? 'bg-emerald-500/20 text-emerald-400' :
+              req.status === 'rejected' ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400'
+            }">${req.status.toUpperCase()}</span>
+          </td>
+          <td class="p-4 text-right space-x-1">
+            <button onclick="updateRequestStatus('${req.id}', 'approved')" class="px-2 py-1 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 rounded text-xs">Approve</button>
+            <button onclick="updateRequestStatus('${req.id}', 'rejected')" class="px-2 py-1 bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 rounded text-xs">Decline</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function updateRequestStatus(id, status) {
+      if (!supabase) return;
+      const { error } = await supabase.from('join_requests').update({ status }).eq('id', id);
+      if (error) alert(error.message);
+      else loadJoinRequests();
+    }
+
+    // 5. Clan Armory & Store
+    async function loadArmoryCatalog() {
+      if (!supabase) return;
+      const { data, error } = await supabase.from('merchandise').select('*');
+      if (error) return console.error(error);
+
+      const grid = document.getElementById('armoryGrid');
+      grid.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        grid.innerHTML = `<div class="col-span-4 text-center py-12 text-slate-500">Armory catalog is empty. Click "Seed Database Items" above to provision.</div>`;
+        return;
+      }
+
+      data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-800 rounded-xl overflow-hidden flex flex-col";
+        card.innerHTML = `
+          <div class="h-44 bg-slate-950 flex items-center justify-center p-4">
+            <img src="${item.image_url}" alt="${item.title}" class="max-h-full object-contain hover:scale-105 transition duration-300">
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-white text-sm">${item.title}</h4>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">${item.description}</p>
+            </div>
+            <div class="mt-4 flex items-center justify-between">
+              <span class="font-extrabold text-amber-400">$${parseFloat(item.price).toFixed(2)}</span>
+              <button onclick="addToCart('${item.id}', '${item.title.replace(/'/g, "\\'")}', ${item.price})" class="px-3 py-1.5 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-xs font-bold rounded-lg transition">
+                Equip Item
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    async function seedSampleMerchandise() {
+      if (!supabase) return alert("Supabase is not configured.");
+      const items = [
+        {
+          title: "Valhalla Pro War Jersey",
+          description: "High-performance dry-fit esports jersey customized with clan crest.",
+          price: 49.99,
+          image_url: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&auto=format&fit=crop"
+        },
+        {
+          title: "Town Hall 16 Desk Monument",
+          description: "Hand-painted collector resin bust with integrated amber LED core.",
+          price: 89.00,
+          image_url: "https://images.unsplash.com/photo-1563089145-599997674d42?w=400&auto=format&fit=crop"
+        },
+        {
+          title: "P.E.K.K.A Heavy Desk Mat",
+          description: "Stitched-edge, non-slip 900x400mm tactical battle surface.",
+          price: 29.50,
+          image_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop"
+        }
+      ];
+
+      const { error } = await supabase.from('merchandise').insert(items);
+      if (error) alert(error.message);
+      else {
+        alert("Provisioned sample catalog items.");
+        loadArmoryCatalog();
+      }
+    }
+
+    // Cart Handlers
+    function toggleCartDrawer() {
+      const drawer = document.getElementById('cartDrawer');
+      drawer.classList.toggle('translate-x-full');
+    }
+
+    function addToCart(id, title, price) {
+      const existing = cart.find(i => i.id === id);
+      if (existing) existing.qty += 1;
+      else cart.push({ id, title, price, qty: 1 });
+      renderCart();
+    }
+
+    function renderCart() {
+      const list = document.getElementById('cartItemList');
+      list.innerHTML = '';
+      let subtotal = 0;
+      let count = 0;
+
+      cart.forEach(item => {
+        subtotal += item.price * item.qty;
+        count += item.qty;
+        const row = document.createElement('div');
+        row.className = "flex justify-between items-center text-xs bg-slate-950 p-2.5 rounded-lg border border-slate-800";
+        row.innerHTML = `
+          <div>
+            <span class="font-bold text-white block">${item.title}</span>
+            <span class="text-slate-400">$${item.price.toFixed(2)} x ${item.qty}</span>
+          </div>
+          <button onclick="removeFromCart('${item.id}')" class="text-rose-400 hover:text-rose-300">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        `;
+        list.appendChild(row);
+      });
+
+      document.getElementById('cartSubtotal').innerText = `$${subtotal.toFixed(2)}`;
+      document.getElementById('cartCount').innerText = count;
+      lucide.createIcons();
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(i => i.id !== id);
+      renderCart();
+    }
+
+    async function checkoutCart() {
+      if (cart.length === 0) return alert("Cart is empty.");
+      if (!currentUser) return openAuthModal('signin');
+
+      const payload = {
+        user_id: currentUser.id,
+        items: cart,
+        total_amount: cart.reduce((acc, i) => acc + (i.price * i.qty), 0),
+        status: 'pending_payment'
+      };
+
+      const { error } = await supabase.from('orders').insert([payload]);
+      if (error) alert("Checkout failed: " + error.message);
+      else {
+        alert("Requisition recorded! Proceeding to processing queue.");
+        cart = [];
+        renderCart();
+        toggleCartDrawer();
+      }
+    }
+
+    // 6. Realtime Multi-Room Group Chat
+    async function loadChatRooms() {
+      if (!supabase) return;
+      const { data, error } = await supabase.from('chat_rooms').select('*').order('created_at', { ascending: true });
+      if (error) return console.error(error);
+
+      const roomList = document.getElementById('roomList');
+      roomList.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        roomList.innerHTML = `<span class="text-xs text-slate-500 block p-2">No active rooms.</span>`;
+        return;
+      }
+
+      data.forEach(room => {
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition ${
+          currentRoomId === room.id ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+        }`;
+        btn.innerHTML = `<i data-lucide="hash" class="w-3.5 h-3.5"></i> ${room.name}`;
+        btn.onclick = () => selectRoom(room.id, room.name);
+        roomList.appendChild(btn);
+      });
+      lucide.createIcons();
+
+      if (!currentRoomId && data.length > 0) {
+        selectRoom(data[0].id, data[0].name);
+      }
+    }
+
+    async function selectRoom(roomId, roomName) {
+      currentRoomId = roomId;
+      document.getElementById('currentRoomTitle').innerHTML = `<i data-lucide="hash" class="w-4 h-4 text-amber-400"></i> ${roomName}`;
+      lucide.createIcons();
+
+      // Highlight active in list
+      loadChatRooms();
+
+      // Fetch message history
+      const { data: messages, error } = await supabase
+        .from('chat_messages')
+        .select('*, profiles(username, role)')
+        .eq('room_id', roomId)
+        .order('created_at', { ascending: true });
+
+      const container = document.getElementById('messagesContainer');
+      container.innerHTML = '';
+      if (messages) {
+        messages.forEach(msg => appendMessageUI(msg));
+        container.scrollTop = container.scrollHeight;
+      }
+
+      // Realtime subscription setup
+      if (chatChannel) supabase.removeChannel(chatChannel);
+
+      chatChannel = supabase
+        .channel(`room:${roomId}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${roomId}` },
+          async (payload) => {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('username, role')
+              .eq('id', payload.new.user_id)
+              .single();
+
+            appendMessageUI({ ...payload.new, profiles: profile });
+            container.scrollTop = container.scrollHeight;
+          }
+        )
+        .subscribe();
+    }
+
+    function appendMessageUI(msg) {
+      const container = document.getElementById('messagesContainer');
+      const row = document.createElement('div');
+      const isMe = currentUser && msg.user_id === currentUser.id;
+
+      row.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+      row.innerHTML = `
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-xs font-bold ${isMe ? 'text-amber-400' : 'text-slate-300'}">${msg.profiles?.username || 'Chieftain'}</span>
+          <span class="text-[9px] uppercase px-1.5 py-0.2 bg-slate-800 text-slate-400 rounded">${msg.profiles?.role || 'Member'}</span>
+          <span class="text-[10px] text-slate-500">${new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+        <div class="px-4 py-2 rounded-2xl max-w-md text-sm ${
+          isMe ? 'bg-amber-500 text-slate-950 font-medium rounded-tr-none' : 'bg-slate-800 text-slate-100 rounded-tl-none border border-slate-700'
+        }">
+          ${escapeHtml(msg.content)}
+        </div>
+      `;
+      container.appendChild(row);
+    }
+
+    async function handleSendMessage(e) {
+      e.preventDefault();
+      if (!supabase || !currentUser || !currentRoomId) return;
+
+      const input = document.getElementById('chatInput');
+      const content = input.value.trim();
+      if (!content) return;
+
+      input.value = '';
+      const { error } = await supabase.from('chat_messages').insert({
+        room_id: currentRoomId,
+        user_id: currentUser.id,
+        content
+      });
+
+      if (error) alert("Message failed: " + error.message);
+    }
+
+    async function promptCreateRoom() {
+      if (!currentUser) return openAuthModal('signin');
+      const name = prompt("Enter new war table room handle (e.g. cwl-strategy):");
+      if (!name) return;
+
+      const cleanName = name.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+      const { error } = await supabase.from('chat_rooms').insert({
+        name: cleanName,
+        created_by: currentUser.id
+      });
+
+      if (error) alert("Could not create room: " + error.message);
+      else loadChatRooms();
+    }
+
+    function escapeHtml(string) {
+      const div = document.createElement('div');
+      div.innerText = string;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
