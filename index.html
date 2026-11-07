@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clan HQ & Armory Portal</title>
+  <title>Valhalla Vanguard | Clan Portal & Armory</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -25,6 +25,7 @@
       }
     }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 
@@ -38,7 +39,7 @@
 </head>
 <body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
 
-  <!-- HEADER -->
+  <!-- NAVIGATION HEADER -->
   <header class="bg-slate-950/90 border-b border-brand-border sticky top-0 z-40 backdrop-blur">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       
@@ -53,7 +54,7 @@
         </div>
       </div>
 
-      <!-- Protected Navigation Tabs -->
+      <!-- Navigation Tabs -->
       <nav class="hidden md:flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-brand-border text-xs font-semibold">
         <button onclick="navigate('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-lg bg-amber-500 text-slate-950 transition">Home</button>
         <button onclick="navigate('chat')" id="nav-chat" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">Clan Chat</button>
@@ -70,57 +71,57 @@
         </button>
 
         <div id="auth-header-slot">
-          <!-- Populated by JS -->
+          <!-- Handled by updateAuthUI() -->
         </div>
       </div>
     </div>
   </header>
 
-  <!-- MAIN CANVAS -->
+  <!-- MAIN VIEWPORT -->
   <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1 flex flex-col">
 
     <!-- VIEW 1: HOME PAGE -->
     <section id="view-home" class="view-panel space-y-6">
       <div class="bg-gradient-to-r from-slate-950 via-brand-card to-amber-950/20 border border-brand-border rounded-2xl p-6 md:p-10">
-        <span class="text-amber-400 text-xs font-bold uppercase tracking-widest block mb-2">Authenticated Clan Management</span>
-        <h1 class="heading-font text-3xl md:text-4xl font-black text-white leading-tight">Elite War Headquarters</h1>
+        <span class="text-amber-400 text-xs font-bold uppercase tracking-widest block mb-2">Live Cloud Connected</span>
+        <h1 class="heading-font text-3xl md:text-4xl font-black text-white leading-tight">Valhalla Vanguard HQ</h1>
         <p class="text-slate-400 text-xs md:text-sm mt-3 leading-relaxed max-w-2xl">
-          Welcome to the portal. In accordance with operational security, all war telemetry, recruitment channels, group chat, and armory listings require verified credentials.
+          Welcome to the high council hub. Access to war council channels, recruitment rosters, and armory listings is restricted to registered chieftains.
         </p>
 
         <div class="mt-6 flex flex-wrap gap-3" id="home-action-buttons">
-          <!-- Populated based on auth state -->
+          <!-- Populated by JS based on session -->
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-brand-card border border-brand-border rounded-2xl p-6">
-          <i data-lucide="lock" class="w-6 h-6 text-amber-400 mb-3"></i>
-          <h3 class="text-white font-bold text-sm mb-1">Authenticated Chat</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Only authenticated chiefs can view, create rooms, or broadcast tactical messages.</p>
+          <i data-lucide="messages-square" class="w-6 h-6 text-amber-400 mb-3"></i>
+          <h3 class="text-white font-bold text-sm mb-1">Dual Scope Chat</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">Global chat for all visitors, plus encrypted Clan-Only chat isolated by your registered clan tag.</p>
         </div>
         <div class="bg-brand-card border border-brand-border rounded-2xl p-6">
           <i data-lucide="store" class="w-6 h-6 text-amber-400 mb-3"></i>
-          <h3 class="text-white font-bold text-sm mb-1">Zero Pre-Fab Store</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Store starts completely empty until an Admin lists verified physical inventory.</p>
+          <h3 class="text-white font-bold text-sm mb-1">Live Armory</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">Starts empty. Only registered Admins can list and manage inventory items directly in Supabase.</p>
         </div>
         <div class="bg-brand-card border border-brand-border rounded-2xl p-6">
-          <i data-lucide="user-check" class="w-6 h-6 text-amber-400 mb-3"></i>
-          <h3 class="text-white font-bold text-sm mb-1">Full Profile Tracking</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Tracks current clan name and tag, in-game name, and administrative privileges.</p>
+          <i data-lucide="shield-check" class="w-6 h-6 text-amber-400 mb-3"></i>
+          <h3 class="text-white font-bold text-sm mb-1">Authenticated Enlistment</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">Submit war metrics and Town Hall data. Leadership reviews submissions from the Admin panel.</p>
         </div>
       </div>
     </section>
 
-    <!-- VIEW 2: AUTH-LOCKED RESTRICTION WALL -->
+    <!-- VIEW 2: AUTH LOCKOUT WALL -->
     <section id="view-locked" class="view-panel hidden flex-1 flex items-center justify-center py-12">
       <div class="bg-brand-card border border-brand-border max-w-md w-full p-8 rounded-2xl text-center space-y-4 shadow-xl">
         <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center">
-          <i data-lucide="shield-alert" class="w-6 h-6"></i>
+          <i data-lucide="lock" class="w-6 h-6"></i>
         </div>
-        <h2 class="text-lg font-bold text-white uppercase tracking-wider">Access Denied</h2>
+        <h2 class="text-lg font-bold text-white uppercase tracking-wider">Access Restricted</h2>
         <p class="text-xs text-slate-400 leading-relaxed">
-          This division requires an authenticated chieftain session. Anonymous viewing of internal clan communications and assets is forbidden.
+          You must be authenticated with a verified chieftain account to access internal communications, submit applications, or requisition armory items.
         </p>
         <button onclick="openAuthModal('signin')" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition">
           Sign In / Register
@@ -128,37 +129,45 @@
       </div>
     </section>
 
-    <!-- VIEW 3: CLAN CHAT (STRICTLY AUTHENTICATED) -->
+    <!-- VIEW 3: DUAL SCOPE CHAT (GLOBAL & CLAN-ONLY) -->
     <section id="view-chat" class="view-panel hidden">
       <div class="bg-brand-card border border-brand-border rounded-2xl h-[calc(100vh-13rem)] flex overflow-hidden">
         
         <!-- Channels Sidebar -->
         <div class="w-64 border-r border-brand-border flex flex-col bg-slate-950/70">
-          <div class="p-3.5 border-b border-brand-border flex justify-between items-center">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">War Rooms</span>
-            <button onclick="promptNewRoom()" class="p-1 hover:bg-slate-800 text-slate-400 hover:text-white rounded transition" title="Create Room">
-              <i data-lucide="plus" class="w-4 h-4"></i>
+          <div class="p-3.5 border-b border-brand-border">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chat Frequencies</span>
+          </div>
+          <div class="p-2 space-y-1">
+            <button onclick="switchChatScope('global')" id="btn-scope-global" class="w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold flex items-center justify-between transition bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <span class="flex items-center gap-2"><i data-lucide="globe" class="w-4 h-4"></i> Global Chat</span>
+              <span class="text-[9px] uppercase px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">All Clans</span>
+            </button>
+            <button onclick="switchChatScope('clan')" id="btn-scope-clan" class="w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold flex items-center justify-between transition text-slate-400 hover:bg-slate-800 hover:text-white">
+              <span class="flex items-center gap-2"><i data-lucide="shield" class="w-4 h-4"></i> Clan Only</span>
+              <span id="chat-sidebar-clantag" class="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-slate-800 text-amber-400">#TAG</span>
             </button>
           </div>
-          <div id="room-list-container" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
         </div>
 
-        <!-- Chat Conversation Area -->
+        <!-- Chat Main Canvas -->
         <div class="flex-1 flex flex-col bg-brand-card">
           <div class="px-5 py-3 border-b border-brand-border flex justify-between items-center bg-slate-950/30">
             <div>
-              <span id="active-room-display" class="font-bold text-sm text-white flex items-center gap-1.5">
-                <i data-lucide="hash" class="w-4 h-4 text-amber-400"></i> general
+              <span id="active-chat-display" class="font-bold text-sm text-white flex items-center gap-1.5">
+                <i data-lucide="globe" class="w-4 h-4 text-amber-400"></i> Global Frequency
               </span>
-              <span id="active-room-desc" class="text-[11px] text-slate-400">Official clan war coordination</span>
+              <span id="active-chat-desc" class="text-[11px] text-slate-400">Open discussion across all visiting chieftains</span>
             </div>
             <div id="current-user-role-badge" class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-amber-400 border border-slate-700"></div>
           </div>
 
-          <div id="messages-container" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+          <div id="messages-container" class="flex-1 overflow-y-auto p-5 space-y-3">
+            <!-- Messages stream here -->
+          </div>
 
           <form onsubmit="handleMessageSubmit(event)" class="p-3 border-t border-brand-border bg-slate-950 flex gap-2">
-            <input id="chat-text-input" type="text" placeholder="Type transmission..." class="flex-1 bg-slate-900 border border-brand-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+            <input id="chat-text-input" type="text" placeholder="Transmit message..." class="flex-1 bg-slate-900 border border-brand-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
             <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 rounded-xl text-xs transition flex items-center gap-1">
               <i data-lucide="send" class="w-3.5 h-3.5"></i>
             </button>
@@ -167,12 +176,12 @@
       </div>
     </section>
 
-    <!-- VIEW 4: JOIN REQUEST FORM (AUTHENTICATED) -->
+    <!-- VIEW 4: JOIN REQUEST FORM -->
     <section id="view-join" class="view-panel hidden space-y-6">
       <div class="max-w-2xl mx-auto bg-brand-card border border-brand-border p-6 md:p-8 rounded-2xl">
         <div class="mb-6">
           <h2 class="heading-font text-xl font-bold text-white">Clan Enlistment Petition</h2>
-          <p class="text-slate-400 text-xs mt-1">Submit your profile directly to clan leadership for review.</p>
+          <p class="text-slate-400 text-xs mt-1">Submit your credentials directly to the leadership review queue.</p>
         </div>
 
         <form id="join-petition-form" onsubmit="handleJoinPetitionSubmit(event)" class="space-y-4">
@@ -206,7 +215,6 @@
                 <option value="16" selected>Town Hall 16</option>
                 <option value="15">Town Hall 15</option>
                 <option value="14">Town Hall 14</option>
-                <option value="13">Town Hall 13</option>
               </select>
             </div>
             <div>
@@ -214,29 +222,29 @@
               <input required id="petition-stars" type="number" min="0" placeholder="1250" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">Attack Specialization</label>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Combat Specialty</label>
               <select id="petition-spec" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                 <option value="Root Rider Smash">Root Rider Smash</option>
                 <option value="Queen Charge Lalo">Queen Charge Lalo</option>
                 <option value="Super Bowler Walk">Super Bowler Walk</option>
-                <option value="Air / Hydra">Air / Hydra</option>
+                <option value="Hydra / Air">Hydra / Air</option>
               </select>
             </div>
           </div>
 
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-1">Statement to Leadership</label>
-            <textarea id="petition-statement" rows="3" placeholder="Tell officers why you want to join..." class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+            <textarea id="petition-statement" rows="3" placeholder="Tell officers about your active hours and war experience..." class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
           </div>
 
-          <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2">
-            <i data-lucide="send" class="w-4 h-4"></i> Dispatch Petition
+          <button type="submit" id="btn-submit-petition" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2">
+            <i data-lucide="send" class="w-4 h-4"></i> Submit Enlistment Petition
           </button>
         </form>
       </div>
     </section>
 
-    <!-- VIEW 5: CLAN ARMORY (STORE - NO PREFAB) -->
+    <!-- VIEW 5: CLAN ARMORY (STORE) -->
     <section id="view-armory" class="view-panel hidden space-y-6">
       <div class="flex justify-between items-center">
         <div>
@@ -246,20 +254,20 @@
       </div>
 
       <div id="armory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Rendered purely dynamically; starts completely empty -->
+        <!-- Rendered dynamically from Supabase public.merchandise -->
       </div>
     </section>
 
     <!-- VIEW 6: ADMIN CONTROL PANEL -->
     <section id="view-admin" class="view-panel hidden space-y-8">
       
-      <!-- SUBSECTION 1: CREATE NEW MERCH LISTING -->
+      <!-- SUBSECTION 1: CREATE MERCH LISTING -->
       <div class="bg-brand-card border border-brand-border p-6 rounded-2xl space-y-4">
         <div class="flex items-center gap-2">
           <i data-lucide="plus-circle" class="w-5 h-5 text-amber-400"></i>
           <h2 class="heading-font text-lg font-bold text-white">List New Armory Merchandise</h2>
         </div>
-        <p class="text-xs text-slate-400">Add physical gear or collectibles to the Armory store. Items appear in the store immediately.</p>
+        <p class="text-xs text-slate-400">Add physical gear or collectibles to the Armory store. Items are written directly to the database.</p>
 
         <form id="admin-merch-form" onsubmit="handleCreateMerchListing(event)" class="space-y-4 pt-2">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -280,7 +288,7 @@
             <label class="block text-xs font-bold text-slate-300 mb-1">Item Description</label>
             <textarea required id="admin-merch-desc" rows="2" placeholder="Item specs, sizing, materials..." class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
           </div>
-          <button type="submit" class="py-2.5 px-6 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center gap-2">
+          <button type="submit" id="btn-create-merch" class="py-2.5 px-6 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center gap-2">
             <i data-lucide="package-plus" class="w-4 h-4"></i> Publish Item to Armory
           </button>
         </form>
@@ -293,7 +301,7 @@
             <i data-lucide="inbox" class="w-4 h-4 text-amber-400"></i>
             <h3 class="text-sm font-bold text-white">Prospective Chieftain Petitions</h3>
           </div>
-          <button onclick="clearPetitions()" class="text-[11px] text-slate-400 hover:text-rose-400 underline">Clear Closed Records</button>
+          <button onclick="loadPetitions()" class="text-[11px] text-slate-400 hover:text-white underline">Refresh Queue</button>
         </div>
 
         <table class="w-full text-left text-xs">
@@ -308,7 +316,7 @@
             </tr>
           </thead>
           <tbody id="admin-petitions-tbody" class="divide-y divide-brand-border font-mono">
-            <!-- Dynamic rows -->
+            <!-- Loaded dynamically from Supabase -->
           </tbody>
         </table>
       </div>
@@ -317,21 +325,21 @@
 
   </main>
 
-  <!-- AUTHENTICATION DIALOG (SIGN IN & SIGN UP WITH CLAN DETAILS) -->
+  <!-- AUTHENTICATION MODAL -->
   <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
 
-      <!-- Auth Mode Switcher -->
+      <!-- Auth Tabs -->
       <div class="flex border-b border-brand-border mb-5">
         <button onclick="setAuthTab('signin')" id="auth-tab-signin" class="flex-1 py-2 text-xs font-bold border-b-2 border-amber-500 text-amber-400">Sign In</button>
         <button onclick="setAuthTab('signup')" id="auth-tab-signup" class="flex-1 py-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-white">Create Account</button>
       </div>
 
       <!-- Sign In Form -->
-      <form id="signin-form" onsubmit="handleSignIn(event)" class="space-y-3.5">
+      <form id="signin-form" onsubmit="handleSignInSubmit(event)" class="space-y-3.5">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Email Address</label>
           <input required id="signin-email" type="email" placeholder="chief@clash.com" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
@@ -340,13 +348,13 @@
           <label class="block text-xs font-bold text-slate-300 mb-1">Password</label>
           <input required id="signin-password" type="password" placeholder="••••••••" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
         </div>
-        <button type="submit" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition">
+        <button type="submit" id="btn-signin" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition">
           Sign In
         </button>
       </form>
 
-      <!-- Sign Up Form (Includes Current Clan Name and Current Clan ID) -->
-      <form id="signup-form" onsubmit="handleSignUp(event)" class="space-y-3 hidden">
+      <!-- Sign Up Form (Clan metadata included; NO admin tickbox) -->
+      <form id="signup-form" onsubmit="handleSignUpSubmit(event)" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Email Address *</label>
           <input required id="signup-email" type="email" placeholder="chief@clash.com" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
@@ -369,30 +377,27 @@
             <input required id="signup-clan-name" type="text" placeholder="Northern Raiders" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Current Clan ID / Tag *</label>
-            <input required id="signup-clan-id" type="text" placeholder="#2P99QVR" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-amber-500">
+            <label class="block text-xs font-bold text-slate-300 mb-1">Current Clan Tag *</label>
+            <input required id="signup-clan-tag" type="text" placeholder="#2P99QVR" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-amber-500">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1">Password *</label>
-          <input required id="signup-password" type="password" minlength="6" placeholder="At least 6 characters" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+          <label class="block text-xs font-bold text-slate-300 mb-1">Password (min 6 chars) *</label>
+          <input required id="signup-password" type="password" minlength="6" placeholder="••••••••" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
         </div>
 
-        <!-- Role Designation Checkbox (First user / Admin creation) -->
-        <div class="flex items-center gap-2 pt-1">
-          <input type="checkbox" id="signup-is-admin" class="rounded bg-slate-950 border-brand-border text-amber-500 focus:ring-0">
-          <label for="signup-is-admin" class="text-[11px] text-slate-400 font-semibold cursor-pointer">Register this account with Administrator privileges</label>
-        </div>
-
-        <button type="submit" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition">
+        <button type="submit" id="btn-signup" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition">
           Create Chieftain Profile
         </button>
       </form>
+
+      <!-- Alert Box -->
+      <div id="auth-alert" class="hidden text-xs p-3 rounded-lg border mt-3"></div>
     </div>
   </div>
 
-  <!-- CART SLIDE-OVER DRAWER -->
+  <!-- CART DRAWER -->
   <div id="cart-drawer" class="fixed inset-y-0 right-0 w-80 bg-brand-card border-l border-brand-border transform translate-x-full transition-transform duration-200 z-50 flex flex-col shadow-2xl">
     <div class="p-4 border-b border-brand-border flex justify-between items-center">
       <span class="font-bold text-xs uppercase tracking-wider text-white flex items-center gap-2">
@@ -402,9 +407,7 @@
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
     </div>
-    <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-2">
-      <!-- Injected -->
-    </div>
+    <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
     <div class="p-4 border-t border-brand-border bg-slate-950 space-y-3">
       <div class="flex justify-between text-xs font-bold font-mono">
         <span>TOTAL:</span>
@@ -416,184 +419,53 @@
     </div>
   </div>
 
-  <!-- STATE ENGINE -->
+  <!-- APPLICATION LOGIC -->
   <script>
-    const PortalState = {
-      currentUser: JSON.parse(localStorage.getItem('portal_user') || 'null'),
-      usersDb: JSON.parse(localStorage.getItem('portal_users_db') || '[]'),
-      activeRoomId: 'general',
-      rooms: JSON.parse(localStorage.getItem('portal_rooms') || JSON.stringify([
-        { id: 'general', name: 'general', desc: 'Main war room discussion' },
-        { id: 'tactics', name: 'tactics', desc: 'Base attack calls and strategies' }
-      ])),
-      messages: JSON.parse(localStorage.getItem('portal_messages') || '[]'),
-      merchandise: JSON.parse(localStorage.getItem('portal_merchandise') || '[]'), // 100% Zero pre-fab
-      petitions: JSON.parse(localStorage.getItem('portal_petitions') || '[]'),
-      cart: JSON.parse(localStorage.getItem('portal_cart') || '[]')
+    // Supabase Credentials
+    const SUPABASE_CONFIG = {
+      URL: "https://ogtjerbaqlkxoecqjfad.supabase.co",
+      ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndGplcmJhcWxreG9lY3FqZmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNDIyMjcsImV4cCI6MjEwOTYxODIyN30.95N6r5lKVC8o-jADZ-8ncQFgOxUepHavQz1zYkSOE2k"
     };
 
-    window.addEventListener('DOMContentLoaded', () => {
+    const supabase = window.supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.ANON_KEY);
+
+    // Global App State
+    let currentUser = null;
+    let currentProfile = null;
+    let activeChatScope = 'global'; // 'global' or 'clan'
+    let chatRealtimeChannel = null;
+    let cart = JSON.parse(localStorage.getItem('portal_cart') || '[]');
+
+    window.addEventListener('DOMContentLoaded', async () => {
       lucide.createIcons();
-      updateAuthUI();
-      renderRooms();
-      renderMessages();
-      renderArmory();
-      renderPetitions();
+      await checkActiveSession();
       renderCart();
     });
 
-    // 1. Route Navigation & Protection
-    function navigate(viewId) {
-      // Protect internal pages against non-logged in users
-      const protectedViews = ['chat', 'join', 'armory', 'admin'];
-      if (protectedViews.includes(viewId) && !PortalState.currentUser) {
-        showLockedScreen();
-        return;
-      }
+    // 1. Session Management
+    async function checkActiveSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      await applySession(session);
 
-      if (viewId === 'admin' && PortalState.currentUser?.role !== 'Admin') {
-        alert("Access restricted: Administrator status required.");
-        return;
-      }
-
-      document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
-      document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.remove('bg-amber-500', 'text-slate-950');
-        b.classList.add('text-slate-400');
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        await applySession(session);
       });
+    }
 
-      const target = document.getElementById(`view-${viewId}`);
-      if (target) target.classList.remove('hidden');
-
-      const activeNav = document.getElementById(`nav-${viewId}`);
-      if (activeNav) {
-        activeNav.classList.add('bg-amber-500', 'text-slate-950');
-        activeNav.classList.remove('text-slate-400');
+    async function applySession(session) {
+      if (session?.user) {
+        currentUser = session.user;
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', currentUser.id)
+          .single();
+        currentProfile = profile;
+      } else {
+        currentUser = null;
+        currentProfile = null;
       }
-
-      // Pre-fill user details in join petition if logged in
-      if (viewId === 'join' && PortalState.currentUser) {
-        document.getElementById('petition-ign').value = PortalState.currentUser.ign;
-        document.getElementById('petition-tag').value = PortalState.currentUser.tag;
-        document.getElementById('petition-current-clan').value = PortalState.currentUser.clanName || '';
-        document.getElementById('petition-current-clan-tag').value = PortalState.currentUser.clanId || '';
-      }
-    }
-
-    function showLockedScreen() {
-      document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
-      document.querySelectorAll('.nav-btn').forEach(b => {
-        b.classList.remove('bg-amber-500', 'text-slate-950');
-        b.classList.add('text-slate-400');
-      });
-      document.getElementById('view-locked').classList.remove('hidden');
-    }
-
-    // 2. Authentication System (Sign Up & Sign In with Clan Details)
-    function openAuthModal(tab = 'signin') {
-      setAuthTab(tab);
-      document.getElementById('auth-modal').classList.remove('hidden');
-      document.getElementById('auth-modal').classList.add('flex');
-    }
-
-    function closeAuthModal() {
-      document.getElementById('auth-modal').classList.add('hidden');
-      document.getElementById('auth-modal').classList.remove('flex');
-    }
-
-    function setAuthTab(tab) {
-      const isSignIn = tab === 'signin';
-      document.getElementById('signin-form').classList.toggle('hidden', !isSignIn);
-      document.getElementById('signup-form').classList.toggle('hidden', isSignIn);
-
-      document.getElementById('auth-tab-signin').className = isSignIn
-        ? 'flex-1 py-2 text-xs font-bold border-b-2 border-amber-500 text-amber-400'
-        : 'flex-1 py-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-white';
-
-      document.getElementById('auth-tab-signup').className = !isSignIn
-        ? 'flex-1 py-2 text-xs font-bold border-b-2 border-amber-500 text-amber-400'
-        : 'flex-1 py-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-white';
-    }
-
-    function handleSignUp(e) {
-      e.preventDefault();
-      const email = document.getElementById('signup-email').value.trim().toLowerCase();
-      const ign = document.getElementById('signup-ign').value.trim();
-      const tag = document.getElementById('signup-tag').value.trim().toUpperCase();
-      const clanName = document.getElementById('signup-clan-name').value.trim();
-      const clanId = document.getElementById('signup-clan-id').value.trim().toUpperCase();
-      const password = document.getElementById('signup-password').value;
-      const isAdmin = document.getElementById('signup-is-admin').checked;
-
-      if (PortalState.usersDb.some(u => u.email === email)) {
-        return alert("An account with this email is already registered.");
-      }
-
-      const newUser = {
-        id: 'usr_' + Date.now(),
-        email,
-        ign,
-        tag,
-        clanName,
-        clanId,
-        password,
-        role: isAdmin ? 'Admin' : 'Member'
-      };
-
-      PortalState.usersDb.push(newUser);
-      localStorage.setItem('portal_users_db', JSON.stringify(PortalState.usersDb));
-
-      // Auto sign-in
-      PortalState.currentUser = {
-        id: newUser.id,
-        email: newUser.email,
-        ign: newUser.ign,
-        tag: newUser.tag,
-        clanName: newUser.clanName,
-        clanId: newUser.clanId,
-        role: newUser.role
-      };
-      localStorage.setItem('portal_user', JSON.stringify(PortalState.currentUser));
-
-      alert(`Profile created successfully! Welcome, ${newUser.ign} [${newUser.role}].`);
-      document.getElementById('signup-form').reset();
-      closeAuthModal();
       updateAuthUI();
-      navigate('home');
-    }
-
-    function handleSignIn(e) {
-      e.preventDefault();
-      const email = document.getElementById('signin-email').value.trim().toLowerCase();
-      const password = document.getElementById('signin-password').value;
-
-      const user = PortalState.usersDb.find(u => u.email === email && u.password === password);
-      if (!user) {
-        return alert("Invalid email credentials or password.");
-      }
-
-      PortalState.currentUser = {
-        id: user.id,
-        email: user.email,
-        ign: user.ign,
-        tag: user.tag,
-        clanName: user.clanName,
-        clanId: user.clanId,
-        role: user.role
-      };
-      localStorage.setItem('portal_user', JSON.stringify(PortalState.currentUser));
-
-      document.getElementById('signin-form').reset();
-      closeAuthModal();
-      updateAuthUI();
-      navigate('home');
-    }
-
-    function logoutUser() {
-      PortalState.currentUser = null;
-      localStorage.removeItem('portal_user');
-      updateAuthUI();
-      navigate('home');
     }
 
     function updateAuthUI() {
@@ -601,25 +473,26 @@
       const adminNav = document.getElementById('nav-admin');
       const homeActionButtons = document.getElementById('home-action-buttons');
       const roleBadge = document.getElementById('current-user-role-badge');
+      const clanTagDisplay = document.getElementById('chat-sidebar-clantag');
 
-      if (PortalState.currentUser) {
-        // Show Admin link if user has Admin role
-        adminNav.classList.toggle('hidden', PortalState.currentUser.role !== 'Admin');
+      if (currentProfile) {
+        adminNav.classList.toggle('hidden', currentProfile.role !== 'Admin');
+        clanTagDisplay.innerText = currentProfile.clan_tag || '#NONE';
 
         slot.innerHTML = `
           <div class="flex items-center gap-2">
             <div class="text-right">
-              <span class="block text-xs font-bold text-white">${escapeHTML(PortalState.currentUser.ign)}</span>
-              <span class="block text-[9px] font-mono text-amber-400">${PortalState.currentUser.role} • ${escapeHTML(PortalState.currentUser.clanName || 'Clanless')}</span>
+              <span class="block text-xs font-bold text-white">${escapeHTML(currentProfile.ign)}</span>
+              <span class="block text-[9px] font-mono text-amber-400">${currentProfile.role} • ${escapeHTML(currentProfile.clan_name)}</span>
             </div>
-            <button onclick="logoutUser()" class="p-2 bg-brand-surface hover:bg-slate-800 text-slate-400 hover:text-rose-400 rounded-xl border border-brand-border transition" title="Log Out">
+            <button onclick="handleSignOut()" class="p-2 bg-brand-surface hover:bg-slate-800 text-slate-400 hover:text-rose-400 rounded-xl border border-brand-border transition" title="Sign Out">
               <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
             </button>
           </div>
         `;
 
         if (roleBadge) {
-          roleBadge.innerText = `${PortalState.currentUser.role} • ${PortalState.currentUser.ign}`;
+          roleBadge.innerText = `${currentProfile.role} • ${currentProfile.ign}`;
         }
 
         homeActionButtons.innerHTML = `
@@ -643,65 +516,370 @@
 
         homeActionButtons.innerHTML = `
           <button onclick="openAuthModal('signup')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2">
-            <i data-lucide="user-plus" class="w-4 h-4"></i> Create Account to Access
+            <i data-lucide="user-plus" class="w-4 h-4"></i> Register Chieftain Profile
           </button>
         `;
       }
       lucide.createIcons();
     }
 
-    // 3. Admin Merch Listing System (Zero Pre-Fab)
-    function handleCreateMerchListing(e) {
-      e.preventDefault();
-      if (PortalState.currentUser?.role !== 'Admin') return alert("Unauthorized.");
+    // 2. Navigation Routing & Security
+    function navigate(viewId) {
+      const protectedViews = ['chat', 'join', 'armory', 'admin'];
+      if (protectedViews.includes(viewId) && !currentProfile) {
+        showLockedScreen();
+        return;
+      }
 
-      const title = document.getElementById('admin-merch-title').value.trim();
-      const price = parseFloat(document.getElementById('admin-merch-price').value);
-      const image = document.getElementById('admin-merch-image').value.trim();
-      const desc = document.getElementById('admin-merch-desc').value.trim();
+      if (viewId === 'admin' && currentProfile?.role !== 'Admin') {
+        alert("Access restricted: Administrator status required.");
+        return;
+      }
 
-      const newListing = {
-        id: 'merch_' + Date.now(),
-        title,
-        price,
-        image,
-        desc,
-        listedBy: PortalState.currentUser.ign,
-        createdAt: new Date().toLocaleDateString()
-      };
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('bg-amber-500', 'text-slate-950');
+        b.classList.add('text-slate-400');
+      });
 
-      PortalState.merchandise.unshift(newListing);
-      localStorage.setItem('portal_merchandise', JSON.stringify(PortalState.merchandise));
+      const target = document.getElementById(`view-${viewId}`);
+      if (target) target.classList.remove('hidden');
 
-      alert(`"${title}" published to the Armory!`);
-      document.getElementById('admin-merch-form').reset();
-      renderArmory();
-      navigate('armory');
-    }
+      const activeNav = document.getElementById(`nav-${viewId}`);
+      if (activeNav) {
+        activeNav.classList.add('bg-amber-500', 'text-slate-950');
+        activeNav.classList.remove('text-slate-400');
+      }
 
-    function removeMerchListing(id) {
-      if (PortalState.currentUser?.role !== 'Admin') return alert("Unauthorized.");
-      if (confirm("Remove this product listing from the armory?")) {
-        PortalState.merchandise = PortalState.merchandise.filter(m => m.id !== id);
-        localStorage.setItem('portal_merchandise', JSON.stringify(PortalState.merchandise));
-        renderArmory();
+      if (viewId === 'chat') {
+        initChat();
+      } else if (viewId === 'armory') {
+        loadArmoryCatalog();
+      } else if (viewId === 'admin') {
+        loadPetitions();
+      } else if (viewId === 'join' && currentProfile) {
+        document.getElementById('petition-ign').value = currentProfile.ign;
+        document.getElementById('petition-tag').value = currentProfile.player_tag;
+        document.getElementById('petition-current-clan').value = currentProfile.clan_name;
+        document.getElementById('petition-current-clan-tag').value = currentProfile.clan_tag;
       }
     }
 
-    // 4. Armory Catalog Display
-    function renderArmory() {
-      const grid = document.getElementById('armory-grid');
-      grid.innerHTML = '';
+    function showLockedScreen() {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('bg-amber-500', 'text-slate-950');
+        b.classList.add('text-slate-400');
+      });
+      document.getElementById('view-locked').classList.remove('hidden');
+    }
 
-      if (PortalState.merchandise.length === 0) {
+    // 3. Auth Actions
+    function openAuthModal(tab = 'signin') {
+      setAuthTab(tab);
+      clearAuthAlert();
+      document.getElementById('auth-modal').classList.remove('hidden');
+      document.getElementById('auth-modal').classList.add('flex');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+      document.getElementById('auth-modal').classList.remove('flex');
+    }
+
+    function setAuthTab(tab) {
+      const isSignIn = tab === 'signin';
+      document.getElementById('signin-form').classList.toggle('hidden', !isSignIn);
+      document.getElementById('signup-form').classList.toggle('hidden', isSignIn);
+
+      document.getElementById('auth-tab-signin').className = isSignIn
+        ? 'flex-1 py-2 text-xs font-bold border-b-2 border-amber-500 text-amber-400'
+        : 'flex-1 py-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-white';
+
+      document.getElementById('auth-tab-signup').className = !isSignIn
+        ? 'flex-1 py-2 text-xs font-bold border-b-2 border-amber-500 text-amber-400'
+        : 'flex-1 py-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-white';
+    }
+
+    async function handleSignUpSubmit(e) {
+      e.preventDefault();
+      clearAuthAlert();
+      const btn = document.getElementById('btn-signup');
+      btn.disabled = true;
+      btn.innerText = "Registering...";
+
+      const email = document.getElementById('signup-email').value.trim().toLowerCase();
+      const password = document.getElementById('signup-password').value;
+      const ign = document.getElementById('signup-ign').value.trim();
+      const tag = document.getElementById('signup-tag').value.trim().toUpperCase();
+      const clanName = document.getElementById('signup-clan-name').value.trim();
+      const clanTag = document.getElementById('signup-clan-tag').value.trim().toUpperCase();
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            ign: ign,
+            player_tag: tag,
+            clan_name: clanName,
+            clan_tag: clanTag
+          }
+        }
+      });
+
+      btn.disabled = false;
+      btn.innerText = "Create Chieftain Profile";
+
+      if (error) {
+        showAuthAlert(error.message, 'error');
+      } else {
+        showAuthAlert("Registration complete! Check your email or sign in directly.", "success");
+        setAuthTab('signin');
+      }
+    }
+
+    async function handleSignInSubmit(e) {
+      e.preventDefault();
+      clearAuthAlert();
+      const btn = document.getElementById('btn-signin');
+      btn.disabled = true;
+      btn.innerText = "Authenticating...";
+
+      const email = document.getElementById('signin-email').value.trim().toLowerCase();
+      const password = document.getElementById('signin-password').value;
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+      btn.disabled = false;
+      btn.innerText = "Sign In";
+
+      if (error) {
+        showAuthAlert(error.message, 'error');
+      } else {
+        closeAuthModal();
+        navigate('home');
+      }
+    }
+
+    async function handleSignOut() {
+      await supabase.auth.signOut();
+      currentUser = null;
+      currentProfile = null;
+      updateAuthUI();
+      navigate('home');
+    }
+
+    function showAuthAlert(msg, type = 'error') {
+      const box = document.getElementById('auth-alert');
+      box.classList.remove('hidden', 'bg-rose-500/10', 'border-rose-500/20', 'text-rose-300', 'bg-emerald-500/10', 'border-emerald-500/20', 'text-emerald-300');
+      if (type === 'error') {
+        box.classList.add('bg-rose-500/10', 'border-rose-500/20', 'text-rose-300');
+      } else {
+        box.classList.add('bg-emerald-500/10', 'border-emerald-500/20', 'text-emerald-300');
+      }
+      box.innerText = msg;
+    }
+
+    function clearAuthAlert() {
+      const box = document.getElementById('auth-alert');
+      box.classList.add('hidden');
+      box.innerText = '';
+    }
+
+    // 4. Split Chat System (Global & Clan-Only with Realtime)
+    function switchChatScope(scope) {
+      activeChatScope = scope;
+      const isGlobal = scope === 'global';
+
+      document.getElementById('btn-scope-global').className = isGlobal
+        ? 'w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold flex items-center justify-between transition bg-amber-500/20 text-amber-300 border border-amber-500/30'
+        : 'w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold flex items-center justify-between transition text-slate-400 hover:bg-slate-800 hover:text-white';
+
+      document.getElementById('btn-scope-clan').className = !isGlobal
+        ? 'w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold flex items-center justify-between transition bg-amber-500/20 text-amber-300 border border-amber-500/30'
+        : 'w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold flex items-center justify-between transition text-slate-400 hover:bg-slate-800 hover:text-white';
+
+      document.getElementById('active-chat-display').innerHTML = isGlobal
+        ? `<i data-lucide="globe" class="w-4 h-4 text-amber-400"></i> Global Frequency`
+        : `<i data-lucide="shield" class="w-4 h-4 text-amber-400"></i> Clan ${escapeHTML(currentProfile.clan_name)} [${escapeHTML(currentProfile.clan_tag)}]`;
+
+      document.getElementById('active-chat-desc').innerText = isGlobal
+        ? "Open discussion across all visiting chieftains"
+        : "Encrypted frequency restricted strictly to your clan mates";
+
+      lucide.createIcons();
+      initChat();
+    }
+
+    async function initChat() {
+      if (!currentProfile) return;
+      await loadMessages();
+
+      if (chatRealtimeChannel) {
+        supabase.removeChannel(chatRealtimeChannel);
+      }
+
+      chatRealtimeChannel = supabase
+        .channel('chat_realtime_stream')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'chat_messages' },
+          async (payload) => {
+            const newMsg = payload.new;
+            // Filter incoming realtime message by active scope
+            if (activeChatScope === 'global' && newMsg.chat_type === 'global') {
+              await appendSingleMessage(newMsg);
+            } else if (activeChatScope === 'clan' && newMsg.chat_type === 'clan' && newMsg.clan_tag === currentProfile.clan_tag) {
+              await appendSingleMessage(newMsg);
+            }
+          }
+        )
+        .subscribe();
+    }
+
+    async function loadMessages() {
+      const container = document.getElementById('messages-container');
+      container.innerHTML = '<p class="text-xs text-slate-500 text-center py-8">Fetching transmissions...</p>';
+
+      let query = supabase
+        .from('chat_messages')
+        .select('*, profiles(ign, player_tag, role, clan_name)')
+        .eq('chat_type', activeChatScope)
+        .order('created_at', { ascending: true });
+
+      if (activeChatScope === 'clan') {
+        query = query.eq('clan_tag', currentProfile.clan_tag);
+      }
+
+      const { data, error } = await query;
+      container.innerHTML = '';
+
+      if (error || !data || data.length === 0) {
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
+            <i data-lucide="message-square" class="w-8 h-8 mb-2 opacity-40"></i>
+            <p class="text-xs font-bold text-slate-400">No transmissions in ${activeChatScope.toUpperCase()} frequency</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Transmit a command to open communications.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      data.forEach(msg => renderMessageRow(msg));
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function appendSingleMessage(msg) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('ign, player_tag, role, clan_name')
+        .eq('id', msg.user_id)
+        .single();
+
+      msg.profiles = profile;
+      renderMessageRow(msg);
+      const container = document.getElementById('messages-container');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function renderMessageRow(msg) {
+      const container = document.getElementById('messages-container');
+      const isMe = currentProfile && currentProfile.id === msg.user_id;
+      const ign = msg.profiles?.ign || 'Chief';
+      const role = msg.profiles?.role || 'Member';
+      const clanName = msg.profiles?.clan_name || '';
+      const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const row = document.createElement('div');
+      row.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+      row.innerHTML = `
+        <div class="flex items-center gap-1.5 mb-1 text-[11px]">
+          <span class="font-bold ${isMe ? 'text-amber-400' : 'text-slate-200'}">${escapeHTML(ign)}</span>
+          <span class="text-[8px] uppercase px-1 py-0.2 bg-slate-800 text-slate-400 rounded">${role}</span>
+          <span class="text-[9px] font-mono text-slate-500">${escapeHTML(clanName)}</span>
+          <span class="text-[9px] text-slate-500">${time}</span>
+        </div>
+        <div class="px-3.5 py-2 rounded-2xl max-w-md text-xs ${
+          isMe ? 'bg-amber-500 text-slate-950 font-semibold rounded-tr-none' : 'bg-slate-800 text-slate-100 rounded-tl-none border border-brand-border'
+        }">
+          ${escapeHTML(msg.content)}
+        </div>
+      `;
+      container.appendChild(row);
+    }
+
+    async function handleMessageSubmit(e) {
+      e.preventDefault();
+      if (!currentProfile) return showLockedScreen();
+
+      const input = document.getElementById('chat-text-input');
+      const content = input.value.trim();
+      if (!content) return;
+
+      input.value = '';
+
+      const { error } = await supabase.from('chat_messages').insert({
+        user_id: currentProfile.id,
+        chat_type: activeChatScope,
+        clan_tag: currentProfile.clan_tag,
+        content: content
+      });
+
+      if (error) alert("Transmission failure: " + error.message);
+    }
+
+    // 5. Admin Merch Creation & Public Display
+    async function handleCreateMerchListing(e) {
+      e.preventDefault();
+      if (currentProfile?.role !== 'Admin') return alert("Unauthorized.");
+
+      const btn = document.getElementById('btn-create-merch');
+      btn.disabled = true;
+      btn.innerText = "Publishing...";
+
+      const title = document.getElementById('admin-merch-title').value.trim();
+      const price = parseFloat(document.getElementById('admin-merch-price').value);
+      const image_url = document.getElementById('admin-merch-image').value.trim();
+      const description = document.getElementById('admin-merch-desc').value.trim();
+
+      const { error } = await supabase.from('merchandise').insert({
+        title,
+        price,
+        image_url,
+        description,
+        created_by: currentProfile.id
+      });
+
+      btn.disabled = false;
+      btn.innerText = "Publish Item to Armory";
+
+      if (error) {
+        alert("Failed to publish: " + error.message);
+      } else {
+        alert(`"${title}" published to the armory database.`);
+        document.getElementById('admin-merch-form').reset();
+        navigate('armory');
+      }
+    }
+
+    async function loadArmoryCatalog() {
+      const grid = document.getElementById('armory-grid');
+      grid.innerHTML = '<p class="col-span-full text-center text-xs text-slate-500 py-12">Loading armory...</p>';
+
+      const { data, error } = await supabase.from('merchandise').select('*').order('created_at', { ascending: false });
+
+      grid.innerHTML = '';
+      if (error || !data || data.length === 0) {
         grid.innerHTML = `
           <div class="col-span-full py-16 text-center bg-brand-card border border-brand-border rounded-2xl p-8 space-y-3">
             <i data-lucide="package-open" class="w-10 h-10 text-slate-500 mx-auto"></i>
-            <h3 class="text-sm font-bold text-white">Armory is Currently Empty</h3>
-            <p class="text-xs text-slate-400 max-w-sm mx-auto">No merchandise has been published by clan leadership yet.</p>
-            ${PortalState.currentUser?.role === 'Admin' ? `
+            <h3 class="text-sm font-bold text-white">Armory is Empty</h3>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">No merchandise has been published to the database by clan leadership yet.</p>
+            ${currentProfile?.role === 'Admin' ? `
               <button onclick="navigate('admin')" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition">
-                Create First Product Listing
+                List First Product
               </button>
             ` : ''}
           </div>
@@ -710,28 +888,28 @@
         return;
       }
 
-      PortalState.merchandise.forEach(item => {
+      data.forEach(item => {
         const card = document.createElement('div');
         card.className = "bg-brand-card border border-brand-border rounded-2xl overflow-hidden flex flex-col";
         card.innerHTML = `
           <div class="h-48 bg-slate-950 flex items-center justify-center p-4">
-            <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.title)}" class="max-h-full object-contain" onerror="this.src='https://placehold.co/400x300/1e293b/white?text=No+Preview'">
+            <img src="${escapeHTML(item.image_url)}" alt="${escapeHTML(item.title)}" class="max-h-full object-contain" onerror="this.src='https://placehold.co/400x300/1e293b/white?text=No+Preview'">
           </div>
           <div class="p-4 flex-1 flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-start gap-2">
                 <h4 class="font-bold text-white text-sm">${escapeHTML(item.title)}</h4>
-                ${PortalState.currentUser?.role === 'Admin' ? `
-                  <button onclick="removeMerchListing('${item.id}')" class="text-rose-400 hover:text-rose-300 p-1" title="Delete Listing">
+                ${currentProfile?.role === 'Admin' ? `
+                  <button onclick="deleteMerchListing('${item.id}')" class="text-rose-400 hover:text-rose-300 p-1" title="Delete Product">
                     <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                   </button>
                 ` : ''}
               </div>
-              <p class="text-xs text-slate-400 mt-1 line-clamp-2">${escapeHTML(item.desc)}</p>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">${escapeHTML(item.description)}</p>
             </div>
             <div class="mt-4 flex items-center justify-between">
-              <span class="font-mono text-sm font-bold text-amber-400">$${item.price.toFixed(2)}</span>
-              <button onclick="addToCart('${item.id}')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition flex items-center gap-1">
+              <span class="font-mono text-sm font-bold text-amber-400">$${parseFloat(item.price).toFixed(2)}</span>
+              <button onclick="addToCart('${item.id}', '${item.title.replace(/'/g, "\\'")}', ${item.price})" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition flex items-center gap-1">
                 <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> Equip
               </button>
             </div>
@@ -742,21 +920,27 @@
       lucide.createIcons();
     }
 
-    // 5. Cart Logic
+    async function deleteMerchListing(id) {
+      if (currentProfile?.role !== 'Admin') return;
+      if (!confirm("Permanently delete this product from the database?")) return;
+
+      const { error } = await supabase.from('merchandise').delete().eq('id', id);
+      if (error) alert("Deletion failed: " + error.message);
+      else loadArmoryCatalog();
+    }
+
+    // 6. Cart & Order Execution
     function toggleCartDrawer() {
       document.getElementById('cart-drawer').classList.toggle('translate-x-full');
     }
 
-    function addToCart(id) {
-      if (!PortalState.currentUser) return showLockedScreen();
-      const item = PortalState.merchandise.find(m => m.id === id);
-      if (!item) return;
-
-      const existing = PortalState.cart.find(c => c.id === id);
+    function addToCart(id, title, price) {
+      if (!currentProfile) return showLockedScreen();
+      const existing = cart.find(c => c.id === id);
       if (existing) existing.qty += 1;
-      else PortalState.cart.push({ id: item.id, title: item.title, price: item.price, qty: 1 });
+      else cart.push({ id, title, price, qty: 1 });
 
-      localStorage.setItem('portal_cart', JSON.stringify(PortalState.cart));
+      localStorage.setItem('portal_cart', JSON.stringify(cart));
       renderCart();
       toggleCartDrawer();
     }
@@ -767,10 +951,10 @@
       let sum = 0;
       let count = 0;
 
-      if (PortalState.cart.length === 0) {
+      if (cart.length === 0) {
         container.innerHTML = `<p class="text-slate-500 text-xs text-center py-8 font-mono">REQUISITION BAG EMPTY</p>`;
       } else {
-        PortalState.cart.forEach(c => {
+        cart.forEach(c => {
           sum += c.price * c.qty;
           count += c.qty;
           const row = document.createElement('div');
@@ -794,176 +978,95 @@
     }
 
     function removeFromCart(id) {
-      PortalState.cart = PortalState.cart.filter(c => c.id !== id);
-      localStorage.setItem('portal_cart', JSON.stringify(PortalState.cart));
+      cart = cart.filter(c => c.id !== id);
+      localStorage.setItem('portal_cart', JSON.stringify(cart));
       renderCart();
     }
 
-    function checkoutCart() {
-      if (PortalState.cart.length === 0) return alert("Your requisition bag is empty.");
-      if (!PortalState.currentUser) return showLockedScreen();
+    async function checkoutCart() {
+      if (cart.length === 0) return alert("Your cart is empty.");
+      if (!currentProfile) return showLockedScreen();
 
-      alert(`Order confirmed for ${PortalState.currentUser.ign}! A confirmation receipt has been sent to ${PortalState.currentUser.email}.`);
-      PortalState.cart = [];
-      localStorage.removeItem('portal_cart');
-      renderCart();
-      toggleCartDrawer();
-    }
+      const total = cart.reduce((acc, c) => acc + (c.price * c.qty), 0);
 
-    // 6. Multi-Room Group Chat
-    function renderRooms() {
-      const container = document.getElementById('room-list-container');
-      container.innerHTML = '';
-
-      PortalState.rooms.forEach(room => {
-        const isActive = PortalState.activeRoomId === room.id;
-        const btn = document.createElement('button');
-        btn.className = `w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition ${
-          isActive ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-        }`;
-        btn.innerHTML = `<i data-lucide="hash" class="w-3.5 h-3.5"></i> ${escapeHTML(room.name)}`;
-        btn.onclick = () => selectRoom(room);
-        container.appendChild(btn);
+      const { error } = await supabase.from('orders').insert({
+        user_id: currentProfile.id,
+        items: cart,
+        total_amount: total,
+        status: 'pending'
       });
-      lucide.createIcons();
-    }
 
-    function selectRoom(room) {
-      PortalState.activeRoomId = room.id;
-      document.getElementById('active-room-display').innerHTML = `<i data-lucide="hash" class="w-4 h-4 text-amber-400"></i> ${escapeHTML(room.name)}`;
-      document.getElementById('active-room-desc').innerText = room.desc;
-      renderRooms();
-      renderMessages();
-    }
-
-    function promptNewRoom() {
-      if (!PortalState.currentUser) return showLockedScreen();
-      const name = prompt("Enter new room channel name (e.g. cwl-targets):");
-      if (!name) return;
-
-      const cleanId = name.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
-      if (PortalState.rooms.some(r => r.id === cleanId)) return alert("Room already exists.");
-
-      const newRoom = { id: cleanId, name: cleanId, desc: 'Clan coordination channel' };
-      PortalState.rooms.push(newRoom);
-      localStorage.setItem('portal_rooms', JSON.stringify(PortalState.rooms));
-      renderRooms();
-      selectRoom(newRoom);
-    }
-
-    function renderMessages() {
-      const container = document.getElementById('messages-container');
-      container.innerHTML = '';
-
-      const roomMessages = PortalState.messages.filter(m => m.roomId === PortalState.activeRoomId);
-
-      if (roomMessages.length === 0) {
-        container.innerHTML = `
-          <div class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
-            <i data-lucide="message-square" class="w-8 h-8 mb-2 opacity-40"></i>
-            <p class="text-xs font-bold text-slate-400">No transmissions in #${escapeHTML(PortalState.activeRoomId)}</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">Send a transmission to start coordination.</p>
-          </div>
-        `;
-        lucide.createIcons();
-        return;
+      if (error) {
+        alert("Failed to record order: " + error.message);
+      } else {
+        alert(`Order confirmed for ${currentProfile.ign}! Recorded in database.`);
+        cart = [];
+        localStorage.removeItem('portal_cart');
+        renderCart();
+        toggleCartDrawer();
       }
-
-      roomMessages.forEach(msg => {
-        const isMe = PortalState.currentUser && PortalState.currentUser.id === msg.userId;
-        const row = document.createElement('div');
-        row.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
-        row.innerHTML = `
-          <div class="flex items-center gap-1.5 mb-1 text-[11px]">
-            <span class="font-bold ${isMe ? 'text-amber-400' : 'text-slate-200'}">${escapeHTML(msg.ign)}</span>
-            <span class="text-[9px] font-mono text-slate-500">${escapeHTML(msg.tag)} • ${escapeHTML(msg.clanName || '')}</span>
-            <span class="text-[9px] text-slate-500">${msg.time}</span>
-          </div>
-          <div class="px-3.5 py-2 rounded-2xl max-w-md text-xs ${
-            isMe ? 'bg-amber-500 text-slate-950 font-semibold rounded-tr-none' : 'bg-slate-800 text-slate-100 rounded-tl-none border border-brand-border'
-          }">
-            ${escapeHTML(msg.text)}
-          </div>
-        `;
-        container.appendChild(row);
-      });
-      container.scrollTop = container.scrollHeight;
-      lucide.createIcons();
-    }
-
-    function handleMessageSubmit(e) {
-      e.preventDefault();
-      if (!PortalState.currentUser) return showLockedScreen();
-
-      const input = document.getElementById('chat-text-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const newMsg = {
-        id: 'msg_' + Date.now(),
-        roomId: PortalState.activeRoomId,
-        userId: PortalState.currentUser.id,
-        ign: PortalState.currentUser.ign,
-        tag: PortalState.currentUser.tag,
-        clanName: PortalState.currentUser.clanName,
-        text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      PortalState.messages.push(newMsg);
-      localStorage.setItem('portal_messages', JSON.stringify(PortalState.messages));
-      input.value = '';
-      renderMessages();
     }
 
     // 7. Join Petitions & Admin Review
-    function handleJoinPetitionSubmit(e) {
+    async function handleJoinPetitionSubmit(e) {
       e.preventDefault();
-      if (!PortalState.currentUser) return showLockedScreen();
+      if (!currentProfile) return showLockedScreen();
 
-      const petition = {
-        id: 'pet_' + Date.now(),
-        userId: PortalState.currentUser.id,
+      const btn = document.getElementById('btn-submit-petition');
+      btn.disabled = true;
+      btn.innerText = "Dispatching...";
+
+      const payload = {
+        user_id: currentProfile.id,
         ign: document.getElementById('petition-ign').value.trim(),
-        tag: document.getElementById('petition-tag').value.trim().toUpperCase(),
-        currentClan: document.getElementById('petition-current-clan').value.trim(),
-        currentClanTag: document.getElementById('petition-current-clan-tag').value.trim().toUpperCase(),
+        player_tag: document.getElementById('petition-tag').value.trim().toUpperCase(),
+        current_clan: document.getElementById('petition-current-clan').value.trim(),
+        current_clan_tag: document.getElementById('petition-current-clan-tag').value.trim().toUpperCase(),
         town_hall: parseInt(document.getElementById('petition-th').value),
         war_stars: parseInt(document.getElementById('petition-stars').value),
         specialty: document.getElementById('petition-spec').value,
         statement: document.getElementById('petition-statement').value.trim(),
-        status: 'pending',
-        submittedAt: new Date().toLocaleDateString()
+        status: 'pending'
       };
 
-      PortalState.petitions.unshift(petition);
-      localStorage.setItem('portal_petitions', JSON.stringify(PortalState.petitions));
+      const { error } = await supabase.from('join_petitions').insert(payload);
 
-      alert("Petition recorded and submitted to clan leadership for review!");
-      document.getElementById('join-petition-form').reset();
-      renderPetitions();
-      navigate('home');
+      btn.disabled = false;
+      btn.innerText = "Submit Enlistment Petition";
+
+      if (error) {
+        alert("Failed to submit petition: " + error.message);
+      } else {
+        alert("Petition recorded in database. Clan leadership will review it shortly.");
+        document.getElementById('join-petition-form').reset();
+        navigate('home');
+      }
     }
 
-    function renderPetitions() {
+    async function loadPetitions() {
       const tbody = document.getElementById('admin-petitions-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
+      tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Loading petitions...</td></tr>';
 
-      if (PortalState.petitions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 font-sans text-xs">No pending enlistment petitions in queue.</td></tr>`;
+      const { data, error } = await supabase
+        .from('join_petitions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      tbody.innerHTML = '';
+      if (error || !data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No petitions currently in queue.</td></tr>';
         return;
       }
 
-      PortalState.petitions.forEach(p => {
+      data.forEach(p => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-900/50";
         tr.innerHTML = `
           <td class="p-3.5 font-bold text-white">
-            ${escapeHTML(p.ign)} <span class="block text-[10px] text-slate-500">${escapeHTML(p.tag)}</span>
+            ${escapeHTML(p.ign)} <span class="block text-[10px] text-slate-500">${escapeHTML(p.player_tag)}</span>
           </td>
           <td class="p-3.5 text-slate-300">
-            ${escapeHTML(p.currentClan)} <span class="block text-[10px] text-slate-500">${escapeHTML(p.currentClanTag)}</span>
+            ${escapeHTML(p.current_clan)} <span class="block text-[10px] text-slate-500">${escapeHTML(p.current_clan_tag)}</span>
           </td>
           <td class="p-3.5">TH${p.town_hall}</td>
           <td class="p-3.5 text-amber-400 font-bold">${p.war_stars}</td>
@@ -974,29 +1077,19 @@
             }">${p.status.toUpperCase()}</span>
           </td>
           <td class="p-3.5 text-right space-x-1">
-            <button onclick="updatePetitionStatus('${p.id}', 'approved')" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 rounded text-[10px] transition">APPROVE</button>
-            <button onclick="updatePetitionStatus('${p.id}', 'rejected')" class="px-2.5 py-1 bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 rounded text-[10px] transition">DECLINE</button>
+            <button onclick="setPetitionStatus('${p.id}', 'approved')" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 rounded text-[10px] transition">APPROVE</button>
+            <button onclick="setPetitionStatus('${p.id}', 'rejected')" class="px-2.5 py-1 bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 rounded text-[10px] transition">DECLINE</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    function updatePetitionStatus(id, status) {
-      if (PortalState.currentUser?.role !== 'Admin') return alert("Unauthorized.");
-      const pet = PortalState.petitions.find(p => p.id === id);
-      if (pet) {
-        pet.status = status;
-        localStorage.setItem('portal_petitions', JSON.stringify(PortalState.petitions));
-        renderPetitions();
-      }
-    }
-
-    function clearPetitions() {
-      if (PortalState.currentUser?.role !== 'Admin') return alert("Unauthorized.");
-      PortalState.petitions = PortalState.petitions.filter(p => p.status === 'pending');
-      localStorage.setItem('portal_petitions', JSON.stringify(PortalState.petitions));
-      renderPetitions();
+    async function setPetitionStatus(id, status) {
+      if (currentProfile?.role !== 'Admin') return alert("Unauthorized.");
+      const { error } = await supabase.from('join_petitions').update({ status }).eq('id', id);
+      if (error) alert(error.message);
+      else loadPetitions();
     }
 
     function escapeHTML(str) {
