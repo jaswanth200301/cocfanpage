@@ -3,755 +3,1257 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vanguard Nexus</title>
-  
+  <title>Vanguard Chieftains | Clash of Clans Clan Portal & Armory</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts: Supercell-Style Gaming Font & Clean Modern Body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800&family=Russo+One&display=swap" rel="stylesheet">
+
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            nxamber: '#F59E0B',
-            nxslate: '#0F172A',
-            nxcard: '#1E293B',
-            nxborder: '#334155'
+            clash: {
+              gold: '#F59E0B',
+              goldLight: '#FCD34D',
+              goldDark: '#B45309',
+              elixir: '#D946EF',
+              darkElixir: '#06B6D4',
+              red: '#EF4444',
+              green: '#10B981',
+              dark: '#0B0F19',
+              card: '#131B2E',
+              panel: '#1A243B',
+              border: '#283553'
+            }
+          },
+          fontFamily: {
+            clash: ['"Russo One"', 'sans-serif'],
+            cinzel: ['"Cinzel"', 'serif'],
+            sans: ['"Inter"', 'sans-serif']
+          },
+          boxShadow: {
+            'gold-glow': '0 0 25px rgba(245, 158, 11, 0.35)',
+            'elixir-glow': '0 0 25px rgba(217, 70, 239, 0.35)',
+            'shield-glow': '0 8px 30px rgba(0, 0, 0, 0.6)'
           }
         }
       }
     }
   </script>
 
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    /* Custom game-styled scrollbars */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #0B0F19; }
+    ::-webkit-scrollbar-thumb { background: #283553; border-radius: 4px; border: 1px solid #131B2E; }
+    ::-webkit-scrollbar-thumb:hover { background: #F59E0B; }
+
+    /* Animated Gold & Elixir Sheen */
+    .btn-gold {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #B45309 100%);
+      box-shadow: 0 4px 0 #78350F, 0 10px 20px rgba(245, 158, 11, 0.3);
+      transition: all 0.15s ease-in-out;
+    }
+    .btn-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #78350F, 0 14px 24px rgba(245, 158, 11, 0.45);
+      filter: brightness(1.08);
+    }
+    .btn-gold:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #78350F;
+    }
+
+    .btn-elixir {
+      background: linear-gradient(135deg, #E879F9 0%, #D946EF 50%, #A21CAF 100%);
+      box-shadow: 0 4px 0 #701A75, 0 10px 20px rgba(217, 70, 239, 0.3);
+      transition: all 0.15s ease-in-out;
+    }
+    .btn-elixir:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #701A75, 0 14px 24px rgba(217, 70, 239, 0.45);
+      filter: brightness(1.08);
+    }
+    .btn-elixir:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #701A75;
+    }
+
+    .clash-card-border {
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-amber-500 selection:text-black">
+<body class="bg-clash-dark text-slate-100 font-sans min-h-screen flex flex-col selection:bg-clash-gold selection:text-slate-950">
 
-  <!-- ========================================== -->
-  <!-- CONFIGURATION CONSTANTS                     -->
-  <!-- ========================================== -->
-  <script>
-    const CONFIG_VAULT = {
-      ENDPOINT: "https://ogtjerbaqlkxoecqjfad.supabase.co",
-      CIPHER_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndGplcmJhcWxreG9lY3FqZmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNDIyMjcsImV4cCI6MjEwOTYxODIyN30.95N6r5lKVC8o-jADZ-8ncQFgOxUepHavQz1zYkSOE2k"
-    };
-  </script>
-
-  <!-- PROTOCOL STATUS RIBBON -->
-  <div id="protocol-ribbon" class="bg-amber-600/10 border-b border-amber-500/20 px-4 py-2 text-xs flex justify-between items-center text-amber-300">
-    <div class="flex items-center gap-2">
-      <i data-lucide="shield" class="w-4 h-4 text-amber-400"></i>
-      <span id="protocol-status-label">STATUS: INITIALIZING CONNECTION</span>
-    </div>
-    <span class="text-[10px] font-mono tracking-widest text-slate-400 uppercase">SYS_VERSION_3.1</span>
-  </div>
-
-  <!-- COMMAND NAVIGATION -->
-  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center shadow-lg shadow-amber-500/10">
-          <i data-lucide="shield-alert" class="w-5 h-5 text-slate-950"></i>
+  <!-- ======================== CLAN SHIELD TOP BAR ======================== -->
+  <header class="sticky top-0 z-40 bg-clash-card/95 backdrop-blur-md border-b border-clash-border shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Clan Badge & Title -->
+      <div class="flex items-center space-x-3.5 cursor-pointer" onclick="switchTab('overview')">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 via-amber-600 to-amber-900 p-[2px] shadow-gold-glow flex items-center justify-center">
+          <div class="w-full h-full bg-clash-dark rounded-[10px] flex items-center justify-center border border-amber-500/40">
+            <i data-lucide="shield-alert" class="w-7 h-7 text-clash-gold"></i>
+          </div>
         </div>
         <div>
-          <span class="font-black tracking-widest text-lg uppercase bg-gradient-to-r from-amber-400 to-amber-200 bg-clip-text text-transparent">NEXUS PROTOCOL</span>
-          <span class="text-[9px] block text-slate-400 tracking-widest font-mono uppercase">COORDINATE NODE</span>
+          <div class="flex items-center gap-2">
+            <span class="font-clash text-xl sm:text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500">
+              VANGUARD
+            </span>
+            <span class="text-[10px] font-clash px-2 py-0.5 rounded bg-amber-500/20 text-clash-gold border border-amber-500/40">LVL 24</span>
+          </div>
+          <p class="text-xs font-semibold text-slate-400 font-sans flex items-center gap-2">
+            <span class="text-emerald-400 font-bold">#2GQ99Y88</span> • 
+            <span class="text-slate-300">Champions League I</span>
+          </p>
         </div>
       </div>
 
-      <nav class="hidden md:flex items-center gap-1 bg-slate-950/60 p-1 rounded-xl border border-slate-800 text-xs">
-        <button onclick="navigateViewport('enlistment')" id="nav-btn-enlistment" class="nexus-nav-btn px-4 py-1.5 rounded-lg font-bold transition text-amber-400 bg-slate-800">ENLISTMENT</button>
-        <button onclick="navigateViewport('depot')" id="nav-btn-depot" class="nexus-nav-btn px-4 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white">DEPOT</button>
-        <button onclick="navigateViewport('relay')" id="nav-btn-relay" class="nexus-nav-btn px-4 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white">COUNCIL RELAY</button>
-        <button onclick="navigateViewport('overwatch')" id="nav-btn-overwatch" class="nexus-nav-btn px-4 py-1.5 rounded-lg font-bold transition text-slate-400 hover:text-white">OVERWATCH</button>
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-1.5 bg-clash-dark/70 p-1.5 rounded-2xl border border-clash-border">
+        <button onclick="switchTab('overview')" id="nav-btn-overview" class="nav-tab px-4 py-2 rounded-xl text-xs font-clash uppercase tracking-wider transition text-clash-gold bg-clash-panel border border-clash-gold/30">
+          <span class="flex items-center gap-1.5"><i data-lucide="fort-awesome" class="w-4 h-4"></i> Citadel</span>
+        </button>
+        <button onclick="switchTab('enlist')" id="nav-btn-enlist" class="nav-tab px-4 py-2 rounded-xl text-xs font-clash uppercase tracking-wider transition text-slate-400 hover:text-white hover:bg-slate-800">
+          <span class="flex items-center gap-1.5"><i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Join Clan</span>
+        </button>
+        <button onclick="switchTab('armory')" id="nav-btn-armory" class="nav-tab px-4 py-2 rounded-xl text-xs font-clash uppercase tracking-wider transition text-slate-400 hover:text-white hover:bg-slate-800">
+          <span class="flex items-center gap-1.5"><i data-lucide="sword" class="w-4 h-4 text-amber-400"></i> Armory</span>
+        </button>
+        <button onclick="switchTab('chat')" id="nav-btn-chat" class="nav-tab px-4 py-2 rounded-xl text-xs font-clash uppercase tracking-wider transition text-slate-400 hover:text-white hover:bg-slate-800 relative">
+          <span class="flex items-center gap-1.5"><i data-lucide="message-square" class="w-4 h-4 text-clash-elixir"></i> War Council</span>
+          <span id="nav-chat-badge" class="hidden absolute top-1 right-1 w-2 h-2 bg-clash-elixir rounded-full animate-ping"></span>
+        </button>
+        <button onclick="switchTab('officer')" id="nav-btn-officer" class="nav-tab px-4 py-2 rounded-xl text-xs font-clash uppercase tracking-wider transition text-slate-400 hover:text-white hover:bg-slate-800">
+          <span class="flex items-center gap-1.5"><i data-lucide="crown" class="w-4 h-4 text-purple-400"></i> Officer HQ</span>
+          <span id="officer-queue-badge" class="ml-1 px-1.5 py-0.2 text-[9px] bg-red-600/80 rounded-full text-white font-sans">0</span>
+        </button>
       </nav>
 
-      <div class="flex items-center gap-3">
-        <button onclick="toggleManifestOverlay()" class="relative p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
-          <i data-lucide="archive" class="w-4 h-4"></i>
-          <span id="manifest-counter" class="absolute -top-1 -right-1 bg-amber-500 text-slate-950 font-black rounded-full w-4 h-4 text-[10px] flex items-center justify-center">0</span>
+      <!-- Cart & Clan Profile Actions -->
+      <div class="flex items-center space-x-3">
+        <!-- Cart Drawer Toggle -->
+        <button onclick="toggleCartDrawer()" class="relative p-2.5 rounded-xl bg-clash-panel border border-clash-border hover:border-amber-500/50 text-slate-200 transition" title="Shopping Cart">
+          <i data-lucide="shopping-bag" class="w-5 h-5 text-clash-gold"></i>
+          <span id="cart-item-count" class="absolute -top-1.5 -right-1.5 bg-clash-elixir text-white font-clash text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-clash-dark">0</span>
         </button>
 
-        <div id="credential-state-anchor">
-          <button onclick="openAuthenticationModal('signin')" class="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-lg transition border border-slate-700 uppercase">
-            AUTHENTICATE
-          </button>
+        <!-- Current Chieftain Account Identity Button -->
+        <div id="user-profile-anchor">
+          <!-- Injected via JS based on login status -->
         </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button onclick="toggleMobileNav()" class="md:hidden p-2 rounded-xl bg-clash-panel border border-clash-border text-slate-300">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
       </div>
+    </div>
+
+    <!-- Mobile Drawer Navigation -->
+    <div id="mobile-nav" class="hidden md:hidden px-4 pb-4 bg-clash-card border-b border-clash-border space-y-2">
+      <button onclick="switchTab('overview'); toggleMobileNav()" class="w-full text-left py-2.5 px-3 rounded-lg text-xs font-clash uppercase text-slate-300 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="fort-awesome" class="w-4 h-4 text-clash-gold"></i> Citadel Overview
+      </button>
+      <button onclick="switchTab('enlist'); toggleMobileNav()" class="w-full text-left py-2.5 px-3 rounded-lg text-xs font-clash uppercase text-slate-300 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="user-plus" class="w-4 h-4 text-emerald-400"></i> Join Clan Enlistment
+      </button>
+      <button onclick="switchTab('armory'); toggleMobileNav()" class="w-full text-left py-2.5 px-3 rounded-lg text-xs font-clash uppercase text-slate-300 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="sword" class="w-4 h-4 text-amber-400"></i> Clan Armory & Merch
+      </button>
+      <button onclick="switchTab('chat'); toggleMobileNav()" class="w-full text-left py-2.5 px-3 rounded-lg text-xs font-clash uppercase text-slate-300 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="message-square" class="w-4 h-4 text-clash-elixir"></i> War Council Chat
+      </button>
+      <button onclick="switchTab('officer'); toggleMobileNav()" class="w-full text-left py-2.5 px-3 rounded-lg text-xs font-clash uppercase text-slate-300 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="crown" class="w-4 h-4 text-purple-400"></i> Officer HQ Review
+      </button>
     </div>
   </header>
 
-  <!-- MATRIX CANVAS -->
-  <main class="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6">
-    
-    <!-- VIEWPORT: ENLISTMENT -->
-    <section id="viewport-enlistment" class="matrix-viewport space-y-6">
-      <div class="bg-gradient-to-r from-slate-900 to-slate-900/60 border border-slate-800 p-6 rounded-2xl relative">
-        <span class="text-amber-400 font-bold tracking-widest text-[10px] uppercase">OPERATIVE SUBMISSION GATE</span>
-        <h1 class="text-2xl font-black tracking-tight mt-1 text-white uppercase">Clan Clearance Protocol</h1>
-        <p class="text-slate-400 text-xs mt-1">Submit offensive telemetry and strategic classification for council evaluation.</p>
-      </div>
+  <!-- ======================== MAIN CONTAINER ======================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
-          <form id="enlistment-dossier-form" onsubmit="transmitEnlistmentPetition(event)" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">CALLSIGN / IGN</label>
-                <input required id="telemetry-callsign" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">TACTICAL MATRIX TAG</label>
-                <input required id="telemetry-hash" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs uppercase focus:outline-none focus:border-amber-500">
-              </div>
+    <!-- TAB 1: CITADEL (OVERVIEW & HERO METRICS) -->
+    <section id="view-overview" class="tab-view space-y-8">
+      
+      <!-- Epic Clan Hero Banner -->
+      <div class="relative overflow-hidden rounded-3xl border border-clash-border bg-gradient-to-b from-slate-900 via-clash-card to-clash-dark p-8 md:p-12 shadow-2xl">
+        <div class="absolute -right-16 -top-16 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-16 -bottom-16 w-80 h-80 bg-fuchsia-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+          <div class="lg:col-span-2 space-y-4">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-clash-gold text-xs font-clash tracking-wide uppercase">
+              <i data-lucide="flame" class="w-4 h-4 text-amber-400"></i> Top 50 Global • 38 Win Streak Active
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">COMMAND LEVEL</label>
-                <select id="telemetry-tier" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
-                  <option value="17">TIER 17</option>
-                  <option value="16" selected>TIER 16</option>
-                  <option value="15">TIER 15</option>
-                  <option value="14">TIER 14</option>
-                  <option value="13">TIER 13</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">CAMPAIGN STARS</label>
-                <input required id="telemetry-trophies" type="number" min="0" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">DOCTRINE SPECIALTY</label>
-                <select id="telemetry-discipline" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
-                  <option value="Siege Tactician">Siege Tactician</option>
-                  <option value="Air Supremacy">Air Supremacy</option>
-                  <option value="Queen Infiltration">Queen Infiltration</option>
-                  <option value="Smash Doctrine">Smash Doctrine</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-[10px] font-bold tracking-widest uppercase text-slate-400 mb-1">STRATEGIC STATEMENT</label>
-              <textarea id="telemetry-brief" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500"></textarea>
-            </div>
-
-            <button type="submit" class="w-full py-2.5 rounded-lg font-black text-xs uppercase tracking-wider bg-amber-500 hover:bg-amber-400 text-slate-950 transition flex items-center justify-center gap-2">
-              <i data-lucide="radio" class="w-4 h-4"></i> TRANSMIT DOSSIER
-            </button>
-          </form>
-        </div>
-
-        <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between">
-          <div class="space-y-3">
-            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">ENLISTMENT STANDARDS</span>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Submissions undergo validation against active battle rosters. Clearance requires high offensive parity and verified active engagement protocols.
+            <h1 class="font-clash text-4xl sm:text-5xl lg:text-6xl text-white tracking-wide leading-tight">
+              SOVEREIGN <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500">VANGUARD</span>
+            </h1>
+            <p class="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
+              An elite international war clan focused on back-to-back 100% destruction wars, competitive Champions I CWL tournaments, and high-tier attack coaching. All hero equipment maxed, zero missed hits tolerated.
             </p>
+
+            <div class="flex flex-wrap gap-4 pt-2">
+              <button onclick="switchTab('enlist')" class="btn-gold px-6 py-3.5 rounded-xl font-clash text-xs uppercase text-slate-950 font-black tracking-wider flex items-center gap-2">
+                <i data-lucide="scroll" class="w-4 h-4"></i> Enlist Chieftain
+              </button>
+              <button onclick="switchTab('chat')" class="px-6 py-3.5 rounded-xl font-clash text-xs uppercase bg-clash-panel hover:bg-slate-800 text-white border border-slate-700 hover:border-clash-elixir transition flex items-center gap-2">
+                <i data-lucide="radio" class="w-4 h-4 text-clash-elixir"></i> War Council
+              </button>
+              <button onclick="switchTab('armory')" class="px-6 py-3.5 rounded-xl font-clash text-xs uppercase bg-clash-panel hover:bg-slate-800 text-amber-300 border border-slate-700 hover:border-amber-400 transition flex items-center gap-2">
+                <i data-lucide="shirt" class="w-4 h-4 text-amber-400"></i> Clan Armory
+              </button>
+            </div>
           </div>
-          <div class="pt-4 border-t border-slate-800 text-[10px] text-slate-500 font-mono">
-            SEC_LEVEL: RESTRICTED
+
+          <!-- Live Clan Badges & Metrics Card -->
+          <div class="bg-clash-panel/90 border border-clash-gold/30 rounded-2xl p-6 shadow-2xl space-y-4">
+            <h3 class="font-clash text-clash-gold text-sm tracking-wider border-b border-slate-800 pb-3 flex items-center justify-between">
+              <span>WAR LOG TELEMETRY</span>
+              <i data-lucide="swords" class="w-4 h-4 text-amber-400"></i>
+            </h3>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="bg-clash-card p-3 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-400 uppercase font-bold block">Trophies</span>
+                <span class="font-clash text-clash-gold text-base">58,740 🏆</span>
+              </div>
+              <div class="bg-clash-card p-3 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-400 uppercase font-bold block">War Log Record</span>
+                <span class="font-clash text-emerald-400 text-base">742 - 58 - 14</span>
+              </div>
+              <div class="bg-clash-card p-3 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-400 uppercase font-bold block">Clan Capital</span>
+                <span class="font-clash text-cyan-400 text-base">Titan I (Maxed)</span>
+              </div>
+              <div class="bg-clash-card p-3 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-400 uppercase font-bold block">Location</span>
+                <span class="font-clash text-purple-300 text-base">International</span>
+              </div>
+            </div>
+
+            <!-- Perks Meter -->
+            <div class="space-y-1.5 pt-2">
+              <div class="flex justify-between text-[11px] font-bold">
+                <span class="text-slate-400">Clan Perk Progress (Level 24)</span>
+                <span class="text-clash-gold">100% Maxed</span>
+              </div>
+              <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800">
+                <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 h-2.5 rounded-full" style="width: 100%"></div>
+              </div>
+              <p class="text-[10px] text-slate-400 flex items-center gap-1.5 pt-1">
+                <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> 1-Gem troop donations & +2 Level upgrade boost active.
+              </p>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Feature Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-clash-card border border-clash-border hover:border-amber-500/40 transition rounded-2xl p-6 group">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-clash-gold mb-4 group-hover:scale-105 transition">
+            <i data-lucide="target" class="w-6 h-6"></i>
+          </div>
+          <h4 class="font-clash text-base text-white mb-1.5">3-Star Meta Coaching</h4>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Co-Leaders provide custom base links for anti-Root Rider, Super Archer Blimp, and Hydra strategies before every battle day.
+          </p>
+        </div>
+
+        <div class="bg-clash-card border border-clash-border hover:border-fuchsia-500/40 transition rounded-2xl p-6 group">
+          <div class="w-12 h-12 rounded-xl bg-fuchsia-500/15 border border-fuchsia-500/30 flex items-center justify-center text-clash-elixir mb-4 group-hover:scale-105 transition">
+            <i data-lucide="users" class="w-6 h-6"></i>
+          </div>
+          <h4 class="font-clash text-base text-white mb-1.5">Active Member War Council</h4>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Real-time chat channels with multiple war tables, callout tags, sound notifications, and seamless account switching.
+          </p>
+        </div>
+
+        <div class="bg-clash-card border border-clash-border hover:border-cyan-500/40 transition rounded-2xl p-6 group">
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-4 group-hover:scale-105 transition">
+            <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+          </div>
+          <h4 class="font-clash text-base text-white mb-1.5">Exclusive Clan Armory</h4>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            Limited-run physical merchandise, custom player-tagged war hoodies, and 3D resin battle statues supporting clan tournaments.
+          </p>
         </div>
       </div>
     </section>
 
-    <!-- VIEWPORT: DEPOT -->
-    <section id="viewport-depot" class="matrix-viewport hidden space-y-6">
-      <div class="flex justify-between items-center">
+    <!-- TAB 2: ENLISTMENT (SUBMIT CLAN JOIN APPLICATION) -->
+    <section id="view-enlist" class="tab-view hidden space-y-6">
+      <div class="max-w-3xl mx-auto">
+        <div class="text-center space-y-2 mb-6">
+          <span class="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-clash uppercase tracking-wider">
+            Clearance Evaluation
+          </span>
+          <h2 class="font-clash text-3xl sm:text-4xl text-white">ENLIST IN SOVEREIGN VANGUARD</h2>
+          <p class="text-slate-400 text-xs sm:text-sm">
+            Applications are dispatched immediately to our Officer Review Queue for Leader evaluation.
+          </p>
+        </div>
+
+        <form id="enlistment-form" onsubmit="handleEnlistmentSubmit(event)" class="bg-clash-card border border-clash-border rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Player IGN -->
+            <div>
+              <label class="block text-xs font-clash text-slate-300 uppercase mb-1.5">In-Game Name (IGN) *</label>
+              <div class="relative">
+                <i data-lucide="user" class="w-4 h-4 text-slate-500 absolute left-3 top-3"></i>
+                <input required id="enlist-ign" type="text" placeholder="e.g. Chief Ragnor" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-clash-gold transition">
+              </div>
+            </div>
+
+            <!-- Player Tag -->
+            <div>
+              <label class="block text-xs font-clash text-slate-300 uppercase mb-1.5">Player Tag *</label>
+              <div class="relative">
+                <i data-lucide="hash" class="w-4 h-4 text-slate-500 absolute left-3 top-3"></i>
+                <input required id="enlist-tag" type="text" placeholder="#9PQ80V2L" pattern="^#?[A-Za-z0-9]{5,12}$" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white uppercase focus:outline-none focus:border-clash-gold transition">
+              </div>
+            </div>
+
+            <!-- Town Hall Level -->
+            <div>
+              <label class="block text-xs font-clash text-slate-300 uppercase mb-1.5">Town Hall Level *</label>
+              <div class="relative">
+                <i data-lucide="shield" class="w-4 h-4 text-slate-500 absolute left-3 top-3"></i>
+                <select id="enlist-th" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-clash-gold transition">
+                  <option value="17">Town Hall 17 (Ancient Obsidian)</option>
+                  <option value="16" selected>Town Hall 16 (Electro Nature)</option>
+                  <option value="15">Town Hall 15 (Magic Giga Inferno)</option>
+                  <option value="14">Town Hall 14 (Jungle Poison Bomb)</option>
+                  <option value="13">Town Hall 13 (Giga Inferno Ice)</option>
+                  <option value="12">Town Hall 12 (Giga Tesla)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- War Stars -->
+            <div>
+              <label class="block text-xs font-clash text-slate-300 uppercase mb-1.5">Total War Stars *</label>
+              <div class="relative">
+                <i data-lucide="star" class="w-4 h-4 text-amber-500 absolute left-3 top-3"></i>
+                <input required id="enlist-stars" type="number" min="100" max="9999" placeholder="e.g. 1540" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-clash-gold transition">
+              </div>
+            </div>
+
+            <!-- Discord Handle -->
+            <div>
+              <label class="block text-xs font-clash text-slate-300 uppercase mb-1.5">Discord Handle *</label>
+              <div class="relative">
+                <i data-lucide="at-sign" class="w-4 h-4 text-indigo-400 absolute left-3 top-3"></i>
+                <input required id="enlist-discord" type="text" placeholder="chief_ragnor" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-clash-gold transition">
+              </div>
+            </div>
+
+            <!-- Primary Attack Composition -->
+            <div>
+              <label class="block text-xs font-clash text-slate-300 uppercase mb-1.5">Combat Doctrine</label>
+              <div class="relative">
+                <i data-lucide="zap" class="w-4 h-4 text-amber-400 absolute left-3 top-3"></i>
+                <select id="enlist-doctrine" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white focus:outline-none focus:border-clash-gold transition">
+                  <option value="Root Rider / Smash">Root Rider & Valkyrie Smash</option>
+                  <option value="Super Bowler Walk">Queen Charge Super Bowler Walk</option>
+                  <option value="Hydra / Blizzard Air">Hydra / Super Archer Blimp</option>
+                  <option value="Lalo Hybrid Master">Zap Titan / Lalo Specialist</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Motivational Pitch -->
+          <div>
+            <label class="block text-xs font-clash text-slate-300 uppercase mb-1.5">Why should the council accept your blade?</label>
+            <textarea id="enlist-pitch" rows="3" placeholder="Tell us about your activity hours, hero equipment progress, and war attendance..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-clash-gold transition"></textarea>
+          </div>
+
+          <button type="submit" class="btn-gold w-full py-3.5 rounded-xl font-clash text-xs uppercase text-slate-950 font-black tracking-wider flex items-center justify-center gap-2">
+            <i data-lucide="send" class="w-4 h-4"></i> DISPATCH PETITION TO LEADERSHIP
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 3: CLAN ARMORY (MERCHANDISE STORE) -->
+    <section id="view-armory" class="tab-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-clash-border pb-5">
         <div>
-          <h2 class="text-xl font-black uppercase text-white">Logistics Depot</h2>
-          <p class="text-slate-400 text-xs">Official clan hardware, physical insignia, and tactical accessories.</p>
+          <span class="px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-clash-gold text-xs font-clash uppercase tracking-wider">
+            Arsenal Requisitions
+          </span>
+          <h2 class="font-clash text-2xl sm:text-3xl text-white mt-1">SOVEREIGN ARMORY</h2>
+          <p class="text-slate-400 text-xs">Official clan apparel and collector relics. All proceeds sponsor monthly CWL gem prize pools.</p>
         </div>
-        <button onclick="provisionSampleInventory()" class="text-[11px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 uppercase">
-          SEED CATALOG
-        </button>
+
+        <div class="flex items-center space-x-2">
+          <span class="text-xs text-slate-400 font-bold font-sans">Filter Category:</span>
+          <select id="armory-filter" onchange="filterArmoryCategory(this.value)" class="bg-clash-panel border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-clash-gold">
+            <option value="ALL">All Requisitions</option>
+            <option value="Apparel">Apparel & Jerseies</option>
+            <option value="Relics">3D Sculptures & Relics</option>
+            <option value="Gear">Battle Desk Gear</option>
+          </select>
+        </div>
       </div>
 
-      <div id="depot-item-matrix" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+      <!-- Armory Merch Cards Grid -->
+      <div id="armory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Rendered dynamically via JS -->
+      </div>
     </section>
 
-    <!-- VIEWPORT: COUNCIL RELAY -->
-    <section id="viewport-relay" class="matrix-viewport hidden">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl h-[calc(100vh-14rem)] flex overflow-hidden">
+    <!-- TAB 4: WAR COUNCIL (REALTIME GROUP CHAT) -->
+    <section id="view-chat" class="tab-view hidden space-y-6">
+      <div class="bg-clash-card border border-clash-border rounded-2xl h-[680px] flex overflow-hidden shadow-2xl">
         
-        <div class="w-60 border-r border-slate-800 flex flex-col bg-slate-950/60">
-          <div class="p-3 border-b border-slate-800 flex justify-between items-center">
-            <span class="text-[10px] font-black tracking-widest text-slate-400 uppercase">SIGNAL NODES</span>
-            <button onclick="executeRoomGenesis()" class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+        <!-- Channels Sidebar -->
+        <div class="w-64 border-r border-clash-border flex flex-col bg-slate-950/70">
+          
+          <div class="p-4 border-b border-clash-border flex items-center justify-between">
+            <span class="font-clash text-xs tracking-wider text-clash-gold uppercase flex items-center gap-1.5">
+              <i data-lucide="radio" class="w-3.5 h-3.5 text-amber-400"></i> War Channels
+            </span>
+            <button onclick="promptNewChannel()" class="p-1 hover:bg-slate-800 text-slate-400 hover:text-white rounded transition" title="Establish New War Table">
+              <i data-lucide="plus" class="w-4 h-4"></i>
             </button>
           </div>
-          <div id="signal-node-registry" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
-        </div>
 
-        <div class="flex-1 flex flex-col bg-slate-900">
-          <div class="px-5 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-900/60">
-            <span id="active-signal-node" class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
-              <i data-lucide="terminal" class="w-4 h-4 text-amber-400"></i> SELECT_CHANNEL
-            </span>
-            <span id="relay-auth-indicator" class="text-[10px] font-mono text-rose-400 uppercase"></span>
+          <!-- Channel List -->
+          <div id="channel-list" class="flex-1 overflow-y-auto p-2 space-y-1">
+            <!-- Populated via JS -->
           </div>
 
-          <div id="telemetry-stream" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+          <!-- Current Logged In Member Card -->
+          <div class="p-3 border-t border-clash-border bg-slate-900/90 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5 min-w-0">
+              <div id="chat-my-avatar" class="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-clash text-xs flex items-center justify-center font-bold">
+                C
+              </div>
+              <div class="truncate">
+                <span id="chat-my-name" class="font-clash text-xs text-white block truncate">Chief Valkyrie</span>
+                <span id="chat-my-role" class="text-[9px] uppercase font-bold text-amber-400 font-sans">Co-Leader</span>
+              </div>
+            </div>
+            <button onclick="openMemberModal()" class="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800" title="Switch or Register Account">
+              <i data-lucide="user-cog" class="w-4 h-4"></i>
+            </button>
+          </div>
 
-          <form id="transmission-console" onsubmit="dispatchTransmission(event)" class="p-3 border-t border-slate-800 bg-slate-950 flex gap-2">
-            <input id="transmission-buffer" type="text" placeholder="AWAITING IDENTITY..." class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500" disabled>
-            <button id="transmission-trigger" type="submit" class="bg-amber-500 hover:bg-amber-400 disabled:opacity-30 text-slate-950 px-4 rounded-lg font-black text-xs uppercase transition" disabled>
-              DISPATCH
+        </div>
+
+        <!-- Chat Room Canvas -->
+        <div class="flex-1 flex flex-col bg-clash-panel">
+          
+          <!-- Channel Header -->
+          <div class="px-6 py-3.5 border-b border-clash-border bg-clash-card/60 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10B981]"></span>
+              <div>
+                <h3 id="current-channel-title" class="font-clash text-sm text-white flex items-center gap-1.5">
+                  #war-planning
+                </h3>
+                <span id="current-channel-topic" class="text-[10px] text-slate-400">Tactical attack allocations and 100% triple hit planning</span>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="simulateClanmateChatter()" class="text-[10px] font-clash bg-clash-dark hover:bg-slate-800 px-2.5 py-1 rounded-lg text-slate-300 border border-slate-700 flex items-center gap-1">
+                <i data-lucide="bot" class="w-3.5 h-3.5 text-clash-elixir"></i> Bot Chatter
+              </button>
+            </div>
+          </div>
+
+          <!-- Chat Stream -->
+          <div id="chat-messages-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <!-- Messages rendered via JS -->
+          </div>
+
+          <!-- Chat Input Bar -->
+          <form onsubmit="handleSendChatMessage(event)" class="p-3.5 border-t border-clash-border bg-clash-card/80 flex items-center gap-2">
+            <input type="text" id="chat-input" placeholder="Transmit battle orders or base scout..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-clash-elixir transition">
+            <button type="submit" class="btn-elixir px-5 py-2.5 rounded-xl font-clash text-xs uppercase text-white font-black tracking-wider flex items-center gap-1.5">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              <span>BROADCAST</span>
             </button>
           </form>
+
         </div>
       </div>
     </section>
 
-    <!-- VIEWPORT: OVERWATCH -->
-    <section id="viewport-overwatch" class="matrix-viewport hidden space-y-6">
-      <div class="flex justify-between items-center">
+    <!-- TAB 5: OFFICER HQ (REVIEW APPLICANTS) -->
+    <section id="view-officer" class="tab-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-clash-border pb-5">
         <div>
-          <h2 class="text-xl font-black uppercase text-white">Overwatch Directive</h2>
-          <p class="text-slate-400 text-xs">Review operative applications and grant clearance.</p>
+          <span class="px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/40 text-purple-400 text-xs font-clash uppercase tracking-wider">
+            Command Review Desk
+          </span>
+          <h2 class="font-clash text-2xl sm:text-3xl text-white mt-1">OFFICER HQ CONSOLE</h2>
+          <p class="text-slate-400 text-xs">High Council review table for new chieftain applicants.</p>
         </div>
-        <button onclick="synchronizeEnlistments()" class="text-[11px] font-bold bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 uppercase">
-          SYNC STREAM
-        </button>
+
+        <div class="flex items-center gap-2">
+          <button onclick="seedSampleApplicants()" class="text-xs font-clash uppercase bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg text-slate-300 border border-slate-700">
+            Seed Sample Petitions
+          </button>
+        </div>
       </div>
 
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-        <table class="w-full text-left text-xs">
-          <thead class="bg-slate-950 border-b border-slate-800 text-slate-400 uppercase text-[9px] tracking-widest font-mono">
-            <tr>
-              <th class="p-3">OPERATIVE</th>
-              <th class="p-3">TIER</th>
-              <th class="p-3">STARS</th>
-              <th class="p-3">DOCTRINE</th>
-              <th class="p-3">VERDICT</th>
-              <th class="p-3 text-right">OVERRIDE</th>
-            </tr>
-          </thead>
-          <tbody id="overwatch-stream-body" class="divide-y divide-slate-800 font-mono"></tbody>
-        </table>
+      <!-- Applicant Cards -->
+      <div id="applicant-queue-container" class="space-y-4">
+        <!-- Rendered via JS -->
       </div>
     </section>
 
   </main>
 
-  <!-- MANIFEST OVERLAY -->
-  <div id="manifest-overlay" class="fixed inset-y-0 right-0 w-80 bg-slate-900 border-l border-slate-800 transform translate-x-full transition-transform duration-200 z-50 flex flex-col shadow-2xl">
-    <div class="p-4 border-b border-slate-800 flex justify-between items-center">
-      <span class="text-xs font-black uppercase tracking-wider text-white">LOGISTICS MANIFEST</span>
-      <button onclick="toggleManifestOverlay()" class="text-slate-400 hover:text-white">
-        <i data-lucide="x" class="w-4 h-4"></i>
+  <!-- ======================== CART SLIDE-OVER DRAWER ======================== -->
+  <div id="cart-drawer" class="fixed inset-y-0 right-0 max-w-md w-full bg-clash-card border-l border-clash-border shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    
+    <div class="p-6 border-b border-clash-border flex items-center justify-between bg-slate-900/60">
+      <div class="flex items-center space-x-2.5">
+        <i data-lucide="shopping-bag" class="w-5 h-5 text-clash-gold"></i>
+        <h3 class="font-clash text-white text-base uppercase">CLAN REQUISITION CART</h3>
+      </div>
+      <button onclick="toggleCartDrawer()" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
-    <div id="manifest-content-stream" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
-    <div class="p-4 border-t border-slate-800 bg-slate-950 space-y-3">
-      <div class="flex justify-between text-xs font-mono font-bold">
-        <span>VALUATION:</span>
-        <span id="manifest-aggregate">$0.00</span>
+
+    <!-- Items Container -->
+    <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-3">
+      <!-- Populated via JS -->
+    </div>
+
+    <!-- Cart Footer & Checkout -->
+    <div class="p-6 border-t border-clash-border bg-slate-950/80 space-y-4">
+      <div class="flex justify-between items-center text-xs font-bold font-sans">
+        <span class="text-slate-400 uppercase">Subtotal</span>
+        <span id="cart-total-display" class="font-clash text-clash-gold text-lg">$0.00</span>
       </div>
-      <button onclick="authorizeRequisition()" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg transition">
-        CONFIRM REQUISITION
+      <button onclick="processCartCheckout()" id="cart-checkout-btn" class="btn-gold w-full py-3.5 rounded-xl font-clash text-xs uppercase text-slate-950 font-black tracking-wider flex items-center justify-center gap-2">
+        <i data-lucide="check-circle" class="w-4 h-4"></i> CONFIRM REQUISITION ORDER
       </button>
     </div>
   </div>
 
-  <!-- AUTHENTICATION DIALOG -->
-  <div id="auth-dialog-backdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl relative">
-      <button onclick="closeAuthenticationModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-        <i data-lucide="x" class="w-4 h-4"></i>
-      </button>
-      <h3 id="auth-modal-header" class="text-sm font-black uppercase tracking-widest text-white mb-4">SECURITY CLEARANCE</h3>
+  <!-- ======================== CHIEFTAIN IDENTITY MODAL ======================== -->
+  <div id="member-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-clash-card border border-clash-border rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-clash-border">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="shield" class="w-5 h-5 text-clash-gold"></i>
+          <h3 class="font-clash text-white text-base uppercase">MEMBER IDENTITY PASSPORT</h3>
+        </div>
+        <button onclick="closeMemberModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
 
-      <form id="auth-credential-form" onsubmit="processCredentials(event)" class="space-y-3">
+      <form onsubmit="handleSaveChieftainIdentity(event)" class="space-y-4">
         <div>
-          <label class="block text-[9px] font-mono tracking-widest uppercase text-slate-400 mb-1">COMM_ADDR</label>
-          <input required id="cred-vector" type="email" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
-        </div>
-        <div>
-          <label class="block text-[9px] font-mono tracking-widest uppercase text-slate-400 mb-1">CIPHER_KEY</label>
-          <input required id="cred-cipher" type="password" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
-        </div>
-        <div id="cred-alias-wrapper" class="hidden">
-          <label class="block text-[9px] font-mono tracking-widest uppercase text-slate-400 mb-1">OPERATIVE_ALIAS</label>
-          <input id="cred-alias" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+          <label class="block text-xs font-clash text-slate-300 uppercase mb-1">In-Game Handle (IGN) *</label>
+          <input required id="id-name" type="text" placeholder="e.g. Chief Valkyrie" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-clash-gold">
         </div>
 
-        <button type="submit" id="auth-dispatch-btn" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg transition mt-2">
-          AUTHENTICATE
+        <div>
+          <label class="block text-xs font-clash text-slate-300 uppercase mb-1">Clan Rank</label>
+          <select id="id-role" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-clash-gold">
+            <option value="Leader">👑 Leader</option>
+            <option value="Co-Leader" selected>⚔️ Co-Leader</option>
+            <option value="Elder">🛡️ Elder</option>
+            <option value="Member">⚡ Member</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-clash text-slate-300 uppercase mb-1">Town Hall</label>
+          <select id="id-th" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-clash-gold">
+            <option value="17">TH 17</option>
+            <option value="16" selected>TH 16</option>
+            <option value="15">TH 15</option>
+            <option value="14">TH 14</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-gold w-full py-3 rounded-xl font-clash text-xs uppercase text-slate-950 font-black tracking-wider">
+          SAVE CLAN IDENTITY
         </button>
       </form>
-
-      <div class="mt-4 text-center text-[10px] text-slate-400">
-        <span id="auth-permutation-prompt">UNREGISTERED OPERATIVE?</span>
-        <button onclick="toggleAuthPermutation()" id="auth-permutation-trigger" class="text-amber-400 font-bold uppercase underline ml-1">ENLIST</button>
-      </div>
     </div>
   </div>
 
-  <!-- SCRIPT ENGINE -->
-  <script>
-    let nexusClient = null;
-    let operativeIdentity = null;
-    let currentSignalNodeId = null;
-    let realtimeChannelSubscription = null;
-    let inventoryManifest = [];
-    let isEnlistmentPhase = false;
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
+  <!-- ======================== CLIENT SCRIPT ENGINE ======================== -->
+  <script>
+    /**
+     * VANGUARD CLAN APPLICATION STATE
+     * Fully self-contained, reactive, client-side localStorage architecture.
+     */
+
+    // Audio SFX Engine via Web Audio API (Zero external audio file URLs required)
+    const SoundFx = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
+      play(type = 'ping') {
+        try {
+          this.init();
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          const t = this.ctx.currentTime;
+
+          if (type === 'ping') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, t); // C5
+            osc.frequency.exponentialRampToValueAtTime(783.99, t + 0.12); // G5
+            gain.gain.setValueAtTime(0.15, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+            osc.start(t);
+            osc.stop(t + 0.15);
+          } else if (type === 'sword') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(220, t);
+            osc.frequency.exponentialRampToValueAtTime(880, t + 0.08);
+            gain.gain.setValueAtTime(0.2, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+            osc.start(t);
+            osc.stop(t + 0.2);
+          } else if (type === 'accept') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, t);
+            osc.frequency.setValueAtTime(659.25, t + 0.1);
+            gain.gain.setValueAtTime(0.2, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+            osc.start(t);
+            osc.stop(t + 0.3);
+          }
+        } catch (e) {
+          // Silent fallback for strict audio policies
+        }
+      }
+    };
+
+    // State Objects
+    let activeChieftain = {
+      name: 'Chief Valkyrie',
+      role: 'Co-Leader',
+      th: '16'
+    };
+
+    let activeChannel = 'war-planning';
+    let cart = [];
+
+    // Official Armory Repertoire
+    const ARMORY_CATALOG = [
+      {
+        id: 'arm-1',
+        title: 'Vanguard Obsidian War Hoodie',
+        category: 'Apparel',
+        price: 58.00,
+        description: 'Heavyweight fleece embroidered with clan crest and Barbarian King shoulder runes.',
+        image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500&auto=format&fit=crop'
+      },
+      {
+        id: 'arm-2',
+        title: 'P.E.K.K.A 10" Polystone Monument',
+        category: 'Relics',
+        price: 89.50,
+        description: 'Hand-sculpted polystone battle sculpture featuring light-up dual purple elixir broadswords.',
+        image: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500&auto=format&fit=crop'
+      },
+      {
+        id: 'arm-3',
+        title: 'Town Hall 16 XXL Tactical Battlemat',
+        category: 'Gear',
+        price: 29.99,
+        description: 'Micro-weave high-glide surface depicting Electro Titan clash against Giga Inferno defenses.',
+        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop'
+      },
+      {
+        id: 'arm-4',
+        title: 'CWL Champions Heavy Brass Medallion',
+        category: 'Relics',
+        price: 24.00,
+        description: 'Solid struck commemorative challenge coin issued to top tier 3-star war attackers.',
+        image: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=500&auto=format&fit=crop'
+      }
+    ];
+
+    // Seed Applicants Data
+    const INITIAL_APPLICANTS = [
+      {
+        id: 'app-101',
+        ign: 'ThunderAxe',
+        tag: '#288UVLC',
+        th: 16,
+        stars: 1840,
+        discord: 'thunder_axe_coc',
+        doctrine: 'Root Rider / Smash',
+        pitch: 'Active in legends league (5600+), never missed an attack in 2 years.',
+        status: 'PENDING',
+        created_at: new Date(Date.now() - 3600000).toISOString()
+      },
+      {
+        id: 'app-102',
+        ign: 'QueenChargePro',
+        tag: '#9YYJ09PL',
+        th: 15,
+        stars: 1250,
+        doctrine: 'Super Bowler Walk',
+        pitch: 'Specialist in 2-phase queen walks. Max giant gauntlet and frozen arrow.',
+        status: 'PENDING',
+        created_at: new Date(Date.now() - 7200000).toISOString()
+      }
+    ];
+
+    // Chat Channels & Initial Chatter
+    let channels = ['war-planning', 'base-designs', 'casual-tavern'];
+    let messages = {
+      'war-planning': [
+        { id: 'm1', sender: 'Chief Valkyrie', role: 'Co-Leader', text: 'Enemy clan has anti-2 star ring bases on #1 through #5. Recommended hydra blimp from 6 o’clock.', time: '10:14 AM' },
+        { id: 'm2', sender: 'BarbarianLord', role: 'Leader', text: 'Confirmed. Hold bottom hits until Co-Leaders approve scout targets. Full destruction needed for tiebreak.', time: '10:18 AM' }
+      ],
+      'base-designs': [
+        { id: 'm3', sender: 'MasterBuilder', role: 'Elder', text: 'Shared new anti-Root Rider box layout in clan chat. Traps are stacked at the town hall compartment.', time: '09:40 AM' }
+      ],
+      'casual-tavern': [
+        { id: 'm4', sender: 'Chief Valkyrie', role: 'Co-Leader', text: 'GG on CWL promotion chiefs! War loot bonuses distributed.', time: 'Yesterday' }
+      ]
+    };
+
+    // --- APPLICATION STARTUP ---
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      bootstrapNexusGateway();
+      loadStateFromStorage();
+      renderChieftainAnchor();
+      renderArmoryGrid(ARMORY_CATALOG);
+      renderChannelList();
+      renderChatMessages();
+      renderApplicantQueue();
+      updateCartUI();
     });
 
-    function bootstrapNexusGateway() {
-      const ep = CONFIG_VAULT.ENDPOINT.trim();
-      const ck = CONFIG_VAULT.CIPHER_KEY.trim();
+    // LocalStorage State Synchronizer
+    function loadStateFromStorage() {
+      const storedIdentity = localStorage.getItem('COC_USER_IDENTITY');
+      if (storedIdentity) {
+        try { activeChieftain = JSON.parse(storedIdentity); } catch (e) {}
+      }
 
-      if (ep !== "YOUR_SUPABASE_URL_HERE" && ck !== "YOUR_SUPABASE_ANON_KEY_HERE" && ep.startsWith("http")) {
-        nexusClient = window.supabase.createClient(ep, ck);
-        document.getElementById('protocol-ribbon').className = "bg-emerald-600/10 border-b border-emerald-500/20 px-4 py-2 text-xs flex justify-between items-center text-emerald-300";
-        
-        verifyActiveClearance();
-        synchronizeDepotGrid();
-        synchronizeSignalNodes();
-        synchronizeEnlistments();
-      } else {
-        document.getElementById('protocol-status-label').innerText = "PROTOCOL LINK: AWAITING CONFIG_VAULT INGESTION";
+      const storedApplicants = localStorage.getItem('COC_APPLICANTS');
+      if (!storedApplicants) {
+        localStorage.setItem('COC_APPLICANTS', JSON.stringify(INITIAL_APPLICANTS));
+      }
+
+      const storedChat = localStorage.getItem('COC_CHAT_STORE');
+      if (storedChat) {
+        try { messages = JSON.parse(storedChat); } catch (e) {}
+      }
+
+      const storedChannels = localStorage.getItem('COC_CHANNELS');
+      if (storedChannels) {
+        try { channels = JSON.parse(storedChannels); } catch (e) {}
+      }
+
+      const storedCart = localStorage.getItem('COC_CART');
+      if (storedCart) {
+        try { cart = JSON.parse(storedCart); } catch (e) {}
       }
     }
 
-    async function verifyActiveClearance() {
-      if (!nexusClient) return;
-      const { data: { session } } = await nexusClient.auth.getSession();
-      reflectIdentityState(session);
-
-      nexusClient.auth.onAuthStateChange((_event, session) => {
-        reflectIdentityState(session);
+    // --- TAB NAVIGATION ---
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.add('hidden'));
+      document.querySelectorAll('.nav-tab').forEach(b => {
+        b.classList.remove('text-clash-gold', 'bg-clash-panel', 'border', 'border-clash-gold/30');
+        b.classList.add('text-slate-400');
       });
+
+      const targetView = document.getElementById(`view-${tabName}`);
+      if (targetView) targetView.classList.remove('hidden');
+
+      const targetBtn = document.getElementById(`nav-btn-${tabName}`);
+      if (targetBtn) {
+        targetBtn.classList.add('text-clash-gold', 'bg-clash-panel', 'border', 'border-clash-gold/30');
+        targetBtn.classList.remove('text-slate-400');
+      }
+
+      if (tabName === 'chat') {
+        document.getElementById('nav-chat-badge').classList.add('hidden');
+        scrollChatToBottom();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    async function reflectIdentityState(session) {
-      const anchor = document.getElementById('credential-state-anchor');
-      const input = document.getElementById('transmission-buffer');
-      const btn = document.getElementById('transmission-trigger');
-      const warning = document.getElementById('relay-auth-indicator');
+    function toggleMobileNav() {
+      document.getElementById('mobile-nav').classList.toggle('hidden');
+    }
 
-      if (session?.user) {
-        operativeIdentity = session.user;
-        const { data: profile } = await nexusClient.from('profiles').select('*').eq('id', operativeIdentity.id).single();
+    // --- IDENTITY PASSPORT LOGIC ---
+    function renderChieftainAnchor() {
+      const anchor = document.getElementById('user-profile-anchor');
+      anchor.innerHTML = `
+        <button onclick="openMemberModal()" class="flex items-center space-x-2 bg-clash-panel hover:bg-slate-800 border border-clash-border px-3 py-1.5 rounded-xl transition text-left">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center font-clash text-slate-950 font-black text-xs">
+            ${activeChieftain.name.charAt(0)}
+          </div>
+          <div class="hidden sm:block">
+            <span class="block text-xs font-clash text-white leading-tight">${escapeHtml(activeChieftain.name)}</span>
+            <span class="block text-[9px] uppercase font-bold text-clash-gold">${activeChieftain.role}</span>
+          </div>
+        </button>
+      `;
+      document.getElementById('chat-my-name').innerText = activeChieftain.name;
+      document.getElementById('chat-my-role').innerText = activeChieftain.role;
+      document.getElementById('chat-my-avatar').innerText = activeChieftain.name.charAt(0);
+    }
 
-        anchor.innerHTML = `
-          <div class="flex items-center gap-2">
-            <div class="text-right">
-              <span class="block text-xs font-black text-white uppercase">${profile?.username || operativeIdentity.email.split('@')[0]}</span>
-              <span class="block text-[8px] font-mono text-amber-400 uppercase">${profile?.role || 'OPERATIVE'}</span>
-            </div>
-            <button onclick="terminateSession()" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg">
-              <i data-lucide="power" class="w-3.5 h-3.5"></i>
-            </button>
+    function openMemberModal() {
+      document.getElementById('id-name').value = activeChieftain.name;
+      document.getElementById('id-role').value = activeChieftain.role;
+      document.getElementById('id-th').value = activeChieftain.th;
+      document.getElementById('member-modal').classList.remove('hidden');
+      document.getElementById('member-modal').classList.add('flex');
+    }
+
+    function closeMemberModal() {
+      document.getElementById('member-modal').classList.add('hidden');
+      document.getElementById('member-modal').classList.remove('flex');
+    }
+
+    function handleSaveChieftainIdentity(e) {
+      e.preventDefault();
+      activeChieftain.name = document.getElementById('id-name').value.trim();
+      activeChieftain.role = document.getElementById('id-role').value;
+      activeChieftain.th = document.getElementById('id-th').value;
+
+      localStorage.setItem('COC_USER_IDENTITY', JSON.stringify(activeChieftain));
+      renderChieftainAnchor();
+      closeMemberModal();
+      showToast(`Logged in as ${activeChieftain.name} (${activeChieftain.role})`, 'success');
+    }
+
+    // --- ENLISTMENT PETITION SUBMISSION ---
+    function handleEnlistmentSubmit(e) {
+      e.preventDefault();
+      SoundFx.play('sword');
+
+      const petition = {
+        id: 'app-' + Date.now(),
+        ign: document.getElementById('enlist-ign').value.trim(),
+        tag: document.getElementById('enlist-tag').value.trim().toUpperCase(),
+        th: parseInt(document.getElementById('enlist-th').value),
+        stars: parseInt(document.getElementById('enlist-stars').value),
+        discord: document.getElementById('enlist-discord').value.trim(),
+        doctrine: document.getElementById('enlist-doctrine').value,
+        pitch: document.getElementById('enlist-pitch').value.trim(),
+        status: 'PENDING',
+        created_at: new Date().toISOString()
+      };
+
+      const applicants = getStoredApplicants();
+      applicants.unshift(petition);
+      localStorage.setItem('COC_APPLICANTS', JSON.stringify(applicants));
+
+      document.getElementById('enlistment-form').reset();
+      renderApplicantQueue();
+      showToast('Enlistment petition dispatched! Leadership notified.', 'success');
+      switchTab('officer');
+    }
+
+    // --- OFFICER REVIEW HQ LOGIC ---
+    function getStoredApplicants() {
+      try {
+        return JSON.parse(localStorage.getItem('COC_APPLICANTS')) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function renderApplicantQueue() {
+      const applicants = getStoredApplicants();
+      const container = document.getElementById('applicant-queue-container');
+      const queueBadge = document.getElementById('officer-queue-badge');
+
+      const pendingCount = applicants.filter(a => a.status === 'PENDING').length;
+      queueBadge.innerText = pendingCount;
+
+      if (applicants.length === 0) {
+        container.innerHTML = `
+          <div class="bg-clash-card border border-clash-border rounded-2xl p-12 text-center text-slate-500 space-y-2">
+            <i data-lucide="shield-check" class="w-8 h-8 mx-auto text-slate-600"></i>
+            <p class="text-xs">No pending enlistments in the High Council queue.</p>
           </div>
         `;
-        input.disabled = false;
-        btn.disabled = false;
-        input.placeholder = "DISPATCH TACTICAL TRANSMISSION...";
-        warning.innerText = "";
-      } else {
-        operativeIdentity = null;
-        anchor.innerHTML = `
-          <button onclick="openAuthenticationModal('signin')" class="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-lg transition border border-slate-700 uppercase">
-            AUTHENTICATE
-          </button>
-        `;
-        input.disabled = true;
-        btn.disabled = true;
-        input.placeholder = "AWAITING IDENTITY...";
-        warning.innerText = "STANDBY: SEC_CLEARANCE_REQUIRED";
+        lucide.createIcons();
+        return;
       }
+
+      container.innerHTML = applicants.map(app => {
+        let badgeColor = 'bg-amber-500/15 text-clash-gold border-amber-500/30';
+        if (app.status === 'ACCEPTED') badgeColor = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
+        if (app.status === 'DECLINED') badgeColor = 'bg-rose-500/15 text-rose-400 border-rose-500/30';
+
+        return `
+          <div class="bg-clash-card border border-clash-border rounded-xl p-5 hover:border-slate-600 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-1.5 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-clash text-white text-base">${escapeHtml(app.ign)}</span>
+                <span class="text-xs font-mono text-clash-gold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 font-bold">${escapeHtml(app.tag)}</span>
+                <span class="text-[10px] font-clash px-2 py-0.5 rounded-full border ${badgeColor}">${app.status}</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400 font-sans">
+                <span class="font-bold text-slate-300">TH ${app.th}</span> • 
+                <span class="text-amber-400 font-bold">${app.stars} Stars</span> • 
+                <span class="text-indigo-400">@${escapeHtml(app.discord)}</span> • 
+                <span class="text-cyan-400">${escapeHtml(app.doctrine)}</span>
+              </div>
+              ${app.pitch ? `<p class="text-xs text-slate-300 italic pt-1">"${escapeHtml(app.pitch)}"` : ''}
+            </div>
+
+            <div class="flex items-center space-x-2 self-end md:self-center">
+              ${app.status === 'PENDING' ? `
+                <button onclick="setApplicantStatus('${app.id}', 'ACCEPTED')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-clash text-xs rounded-xl transition flex items-center gap-1.5">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i> ACCEPT
+                </button>
+                <button onclick="setApplicantStatus('${app.id}', 'DECLINED')" class="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-clash text-xs rounded-xl transition flex items-center gap-1.5">
+                  <i data-lucide="x" class="w-3.5 h-3.5"></i> DECLINE
+                </button>
+              ` : `
+                <button onclick="deleteApplicant('${app.id}')" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-950 text-slate-400 hover:text-rose-300 text-xs rounded-xl border border-slate-700 transition">
+                  Archive
+                </button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+
       lucide.createIcons();
     }
 
-    async function processCredentials(e) {
-      e.preventDefault();
-      if (!nexusClient) return;
-
-      const vector = document.getElementById('cred-vector').value;
-      const cipher = document.getElementById('cred-cipher').value;
-      const alias = document.getElementById('cred-alias').value;
-
-      if (isEnlistmentPhase) {
-        const { error } = await nexusClient.auth.signUp({
-          email: vector,
-          password: cipher,
-          options: { data: { username: alias || vector.split('@')[0] } }
-        });
-        if (error) alert(error.message);
-        else {
-          alert("OPERATIVE CLEARED. ACCESS GRANTED.");
-          toggleAuthPermutation();
-        }
-      } else {
-        const { error } = await nexusClient.auth.signInWithPassword({ email: vector, password: cipher });
-        if (error) alert(error.message);
-        else closeAuthenticationModal();
+    function setApplicantStatus(id, newStatus) {
+      SoundFx.play(newStatus === 'ACCEPTED' ? 'accept' : 'sword');
+      const applicants = getStoredApplicants();
+      const match = applicants.find(a => a.id === id);
+      if (match) {
+        match.status = newStatus;
+        localStorage.setItem('COC_APPLICANTS', JSON.stringify(applicants));
+        renderApplicantQueue();
+        showToast(`Chieftain application ${newStatus.toLowerCase()}!`, 'success');
       }
     }
 
-    async function terminateSession() {
-      if (nexusClient) await nexusClient.auth.signOut();
+    function deleteApplicant(id) {
+      let applicants = getStoredApplicants();
+      applicants = applicants.filter(a => a.id !== id);
+      localStorage.setItem('COC_APPLICANTS', JSON.stringify(applicants));
+      renderApplicantQueue();
+      showToast('Record cleared from queue', 'info');
     }
 
-    function openAuthenticationModal(mode = 'signin') {
-      isEnlistmentPhase = mode === 'signup';
-      const wrapper = document.getElementById('cred-alias-wrapper');
-      const header = document.getElementById('auth-modal-header');
-      const btn = document.getElementById('auth-dispatch-btn');
-      const prompt = document.getElementById('auth-permutation-prompt');
-      const trig = document.getElementById('auth-permutation-trigger');
-
-      header.innerText = isEnlistmentPhase ? "OPERATIVE ENLISTMENT" : "SECURITY CLEARANCE";
-      btn.innerText = isEnlistmentPhase ? "REGISTER IDENTITY" : "AUTHENTICATE";
-      prompt.innerText = isEnlistmentPhase ? "KNOWN IDENTITY?" : "UNREGISTERED OPERATIVE?";
-      trig.innerText = isEnlistmentPhase ? "AUTHENTICATE" : "ENLIST";
-      wrapper.classList.toggle('hidden', !isEnlistmentPhase);
-
-      const modal = document.getElementById('auth-dialog-backdrop');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+    function seedSampleApplicants() {
+      localStorage.setItem('COC_APPLICANTS', JSON.stringify(INITIAL_APPLICANTS));
+      renderApplicantQueue();
+      showToast('Seeded 2 sample applicants!', 'success');
     }
 
-    function closeAuthenticationModal() {
-      const modal = document.getElementById('auth-dialog-backdrop');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    }
-
-    function toggleAuthPermutation() {
-      openAuthenticationModal(isEnlistmentPhase ? 'signin' : 'signup');
-    }
-
-    function navigateViewport(targetId) {
-      document.querySelectorAll('.matrix-viewport').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.nexus-nav-btn').forEach(btn => {
-        btn.classList.remove('text-amber-400', 'bg-slate-800');
-        btn.classList.add('text-slate-400');
-      });
-
-      document.getElementById(`viewport-${targetId}`).classList.remove('hidden');
-      const activeBtn = document.getElementById(`nav-btn-${targetId}`);
-      activeBtn.classList.add('text-amber-400', 'bg-slate-800');
-      activeBtn.classList.remove('text-slate-400');
-    }
-
-    async function transmitEnlistmentPetition(e) {
-      e.preventDefault();
-      if (!nexusClient) return;
-
-      const payload = {
-        ign: document.getElementById('telemetry-callsign').value,
-        player_tag: document.getElementById('telemetry-hash').value,
-        town_hall: parseInt(document.getElementById('telemetry-tier').value),
-        war_stars: parseInt(document.getElementById('telemetry-trophies').value),
-        specialty: document.getElementById('telemetry-discipline').value,
-        statement: document.getElementById('telemetry-brief').value,
-        status: 'pending'
-      };
-
-      const { error } = await nexusClient.from('join_requests').insert([payload]);
-      if (error) alert("TRANSMISSION ERROR: " + error.message);
-      else {
-        alert("TELEMETRY TRANSMITTED TO COUNCIL.");
-        document.getElementById('enlistment-dossier-form').reset();
-        synchronizeEnlistments();
-      }
-    }
-
-    async function synchronizeEnlistments() {
-      if (!nexusClient) return;
-      const { data, error } = await nexusClient.from('join_requests').select('*').order('created_at', { ascending: false });
-      if (error) return;
-
-      const body = document.getElementById('overwatch-stream-body');
-      body.innerHTML = '';
-
-      if (!data || data.length === 0) {
-        body.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-500">NO PENDING TELEMETRY</td></tr>`;
-        return;
-      }
-
-      data.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-950/40";
-        tr.innerHTML = `
-          <td class="p-3 text-white font-bold">${item.ign} <span class="text-slate-500 block text-[9px]">${item.player_tag}</span></td>
-          <td class="p-3">T${item.town_hall}</td>
-          <td class="p-3 text-amber-400">${item.war_stars}</td>
-          <td class="p-3 text-[10px] text-slate-400">${item.specialty}</td>
-          <td class="p-3">
-            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${
-              item.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400' :
-              item.status === 'rejected' ? 'bg-rose-500/10 text-rose-400' : 'bg-amber-500/10 text-amber-400'
-            }">${item.status.toUpperCase()}</span>
-          </td>
-          <td class="p-3 text-right space-x-1">
-            <button onclick="overrideVerdict('${item.id}', 'approved')" class="px-2 py-0.5 bg-emerald-600/20 text-emerald-400 rounded text-[10px]">PASS</button>
-            <button onclick="overrideVerdict('${item.id}', 'rejected')" class="px-2 py-0.5 bg-rose-600/20 text-rose-400 rounded text-[10px]">DENY</button>
-          </td>
-        `;
-        body.appendChild(tr);
-      });
-    }
-
-    async function overrideVerdict(id, status) {
-      if (!nexusClient) return;
-      await nexusClient.from('join_requests').update({ status }).eq('id', id);
-      synchronizeEnlistments();
-    }
-
-    async function synchronizeDepotGrid() {
-      if (!nexusClient) return;
-      const { data, error } = await nexusClient.from('merchandise').select('*');
-      if (error) return;
-
-      const grid = document.getElementById('depot-item-matrix');
-      grid.innerHTML = '';
-
-      if (!data || data.length === 0) {
-        grid.innerHTML = `<div class="col-span-4 text-center py-8 text-slate-500 text-xs font-mono">DEPOT CACHE EMPTY</div>`;
-        return;
-      }
-
-      data.forEach(item => {
-        const el = document.createElement('div');
-        el.className = "bg-slate-900 border border-slate-800 rounded-xl overflow-hidden flex flex-col";
-        el.innerHTML = `
-          <div class="h-36 bg-slate-950 flex items-center justify-center p-3">
-            <img src="${item.image_url}" class="max-h-full object-contain">
+    // --- CLAN ARMORY & CART LOGIC ---
+    function renderArmoryGrid(items) {
+      const grid = document.getElementById('armory-grid');
+      grid.innerHTML = items.map(item => `
+        <div class="bg-clash-card border border-clash-border rounded-2xl overflow-hidden hover:border-amber-500/40 transition flex flex-col group">
+          <div class="h-44 bg-slate-950 overflow-hidden relative">
+            <img src="${item.image}" alt="${escapeHtml(item.title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+            <span class="absolute top-2.5 right-2.5 bg-clash-dark/90 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-clash text-amber-400 border border-amber-500/30">
+              ${item.category}
+            </span>
           </div>
-          <div class="p-3 flex-1 flex flex-col justify-between">
+          <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
             <div>
-              <h4 class="font-bold text-white text-xs uppercase">${item.title}</h4>
-              <p class="text-[10px] text-slate-400 mt-1 line-clamp-2">${item.description}</p>
+              <h4 class="font-clash text-sm text-white">${escapeHtml(item.title)}</h4>
+              <p class="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">${escapeHtml(item.description)}</p>
             </div>
-            <div class="mt-3 flex items-center justify-between">
-              <span class="font-mono text-xs font-bold text-amber-400">$${parseFloat(item.price).toFixed(2)}</span>
-              <button onclick="stageManifestItem('${item.id}', '${item.title.replace(/'/g, "\\'")}', ${item.price})" class="px-2.5 py-1 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-[10px] font-bold uppercase rounded transition">
-                REQUISITION
+            <div class="pt-2 flex items-center justify-between border-t border-slate-800">
+              <span class="font-clash text-clash-gold text-base">$${item.price.toFixed(2)}</span>
+              <button onclick="addToCart('${item.id}')" class="btn-gold px-3 py-1.5 rounded-lg font-clash text-[10px] uppercase text-slate-950 font-black tracking-wider flex items-center gap-1">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> REQUISITION
               </button>
             </div>
           </div>
-        `;
-        grid.appendChild(el);
-      });
-    }
-
-    async function provisionSampleInventory() {
-      if (!nexusClient) return;
-      const payload = [
-        {
-          title: "War Mantle Mark IV",
-          description: "Anti-friction tactical esports apparel with woven vanguard crest.",
-          price: 55.00,
-          image_url: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&auto=format&fit=crop"
-        },
-        {
-          title: "Monolith Layout Slate",
-          description: "High-density mouse mat featuring defensive geometric coordinates.",
-          price: 32.00,
-          image_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop"
-        }
-      ];
-      await nexusClient.from('merchandise').insert(payload);
-      synchronizeDepotGrid();
-    }
-
-    function toggleManifestOverlay() {
-      document.getElementById('manifest-overlay').classList.toggle('translate-x-full');
-    }
-
-    function stageManifestItem(id, title, price) {
-      const match = inventoryManifest.find(i => i.id === id);
-      if (match) match.count += 1;
-      else inventoryManifest.push({ id, title, price, count: 1 });
-      renderManifest();
-    }
-
-    function renderManifest() {
-      const stream = document.getElementById('manifest-content-stream');
-      stream.innerHTML = '';
-      let sum = 0;
-      let units = 0;
-
-      inventoryManifest.forEach(i => {
-        sum += i.price * i.count;
-        units += i.count;
-        const row = document.createElement('div');
-        row.className = "flex justify-between items-center text-xs bg-slate-950 p-2 rounded border border-slate-800 font-mono";
-        row.innerHTML = `
-          <div>
-            <span class="text-white block font-bold">${i.title}</span>
-            <span class="text-slate-400 text-[10px]">$${i.price.toFixed(2)} x ${i.count}</span>
-          </div>
-          <button onclick="purgeManifestItem('${i.id}')" class="text-rose-400 hover:text-rose-300">
-            <i data-lucide="trash" class="w-3.5 h-3.5"></i>
-          </button>
-        `;
-        stream.appendChild(row);
-      });
-
-      document.getElementById('manifest-aggregate').innerText = `$${sum.toFixed(2)}`;
-      document.getElementById('manifest-counter').innerText = units;
+        </div>
+      `).join('');
       lucide.createIcons();
     }
 
-    function purgeManifestItem(id) {
-      inventoryManifest = inventoryManifest.filter(i => i.id !== id);
-      renderManifest();
-    }
-
-    async function authorizeRequisition() {
-      if (inventoryManifest.length === 0) return;
-      if (!operativeIdentity) return openAuthenticationModal('signin');
-
-      const payload = {
-        user_id: operativeIdentity.id,
-        items: inventoryManifest,
-        total_amount: inventoryManifest.reduce((acc, i) => acc + (i.price * i.count), 0),
-        status: 'pending_payment'
-      };
-
-      const { error } = await nexusClient.from('orders').insert([payload]);
-      if (error) alert(error.message);
-      else {
-        alert("REQUISITION RECORDED");
-        inventoryManifest = [];
-        renderManifest();
-        toggleManifestOverlay();
+    function filterArmoryCategory(category) {
+      if (category === 'ALL') {
+        renderArmoryGrid(ARMORY_CATALOG);
+      } else {
+        const filtered = ARMORY_CATALOG.filter(i => i.category === category);
+        renderArmoryGrid(filtered);
       }
     }
 
-    async function synchronizeSignalNodes() {
-      if (!nexusClient) return;
-      const { data, error } = await nexusClient.from('chat_rooms').select('*').order('created_at', { ascending: true });
-      if (error) return;
+    function toggleCartDrawer() {
+      document.getElementById('cart-drawer').classList.toggle('translate-x-full');
+    }
 
-      const registry = document.getElementById('signal-node-registry');
-      registry.innerHTML = '';
+    function addToCart(itemId) {
+      SoundFx.play('ping');
+      const item = ARMORY_CATALOG.find(i => i.id === itemId);
+      if (!item) return;
 
-      if (!data || data.length === 0) {
-        registry.innerHTML = `<span class="text-[10px] text-slate-500 p-2 block font-mono">NO ACTIVE NODES</span>`;
+      const existing = cart.find(c => c.id === itemId);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...item, qty: 1 });
+      }
+
+      localStorage.setItem('COC_CART', JSON.stringify(cart));
+      updateCartUI();
+      showToast(`Added ${item.title} to requisition cart!`, 'info');
+    }
+
+    function updateCartQty(itemId, delta) {
+      const item = cart.find(c => c.id === itemId);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(c => c.id !== itemId);
+      }
+      localStorage.setItem('COC_CART', JSON.stringify(cart));
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const countEl = document.getElementById('cart-item-count');
+      const container = document.getElementById('cart-items-container');
+      const totalEl = document.getElementById('cart-total-display');
+      const checkoutBtn = document.getElementById('cart-checkout-btn');
+
+      const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+      const totalCost = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+      countEl.innerText = totalItems;
+      totalEl.innerText = `$${totalCost.toFixed(2)}`;
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-16 text-slate-500 space-y-2">
+            <i data-lucide="shopping-bag" class="w-8 h-8 mx-auto text-slate-600"></i>
+            <p class="text-xs">Your requisition order list is empty.</p>
+          </div>
+        `;
+        checkoutBtn.disabled = true;
+        checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        checkoutBtn.disabled = false;
+        checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        container.innerHTML = cart.map(item => `
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
+            <div class="flex items-center space-x-3">
+              <img src="${item.image}" alt="" class="w-10 h-10 rounded-lg object-cover">
+              <div>
+                <h5 class="text-xs font-clash text-white line-clamp-1">${escapeHtml(item.title)}</h5>
+                <span class="text-xs text-clash-gold font-bold">$${(item.price * item.qty).toFixed(2)}</span>
+              </div>
+            </div>
+            <div class="flex items-center space-x-1.5 bg-slate-800 p-1 rounded-lg">
+              <button onclick="updateCartQty('${item.id}', -1)" class="w-5 h-5 rounded hover:bg-slate-700 text-xs text-slate-300 flex items-center justify-center">-</button>
+              <span class="text-xs font-bold text-white px-1.5">${item.qty}</span>
+              <button onclick="updateCartQty('${item.id}', 1)" class="w-5 h-5 rounded hover:bg-slate-700 text-xs text-slate-300 flex items-center justify-center">+</button>
+            </div>
+          </div>
+        `).join('');
+      }
+      lucide.createIcons();
+    }
+
+    function processCartCheckout() {
+      SoundFx.play('accept');
+      cart = [];
+      localStorage.setItem('COC_CART', JSON.stringify(cart));
+      updateCartUI();
+      toggleCartDrawer();
+      showToast('Requisition logged! Supply crates dispatched to chieftain citadel.', 'success');
+    }
+
+    // --- WAR COUNCIL REALTIME GROUP CHAT ---
+    function renderChannelList() {
+      const container = document.getElementById('channel-list');
+      container.innerHTML = channels.map(ch => `
+        <button onclick="selectChannel('${ch}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-clash tracking-wide flex items-center gap-2 transition ${
+          activeChannel === ch ? 'bg-amber-500/15 text-clash-gold border border-amber-500/40' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+        }">
+          <i data-lucide="hash" class="w-3.5 h-3.5"></i> ${ch}
+        </button>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function selectChannel(ch) {
+      activeChannel = ch;
+      document.getElementById('current-channel-title').innerText = `#${ch}`;
+      renderChannelList();
+      renderChatMessages();
+    }
+
+    function renderChatMessages() {
+      const container = document.getElementById('chat-messages-container');
+      const list = messages[activeChannel] || [];
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-16 text-slate-500 text-xs space-y-1">
+            <i data-lucide="message-square" class="w-6 h-6 mx-auto text-slate-600"></i>
+            <p>War channel #${activeChannel} open. Transmit tactical battle notes.</p>
+          </div>
+        `;
+        lucide.createIcons();
         return;
       }
 
-      data.forEach(node => {
-        const btn = document.createElement('button');
-        btn.className = `w-full text-left px-3 py-1.5 rounded-lg text-xs font-mono uppercase flex items-center gap-2 transition ${
-          currentSignalNodeId === node.id ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30' : 'text-slate-400 hover:bg-slate-800'
-        }`;
-        btn.innerHTML = `<i data-lucide="hash" class="w-3 h-3"></i> ${node.name}`;
-        btn.onclick = () => activateSignalNode(node.id, node.name);
-        registry.appendChild(btn);
-      });
+      container.innerHTML = list.map(msg => {
+        const isMe = msg.sender === activeChieftain.name;
+        let roleBadgeColor = 'bg-slate-800 text-slate-300 border-slate-700';
+        if (msg.role === 'Leader') roleBadgeColor = 'bg-amber-500/20 text-clash-gold border-amber-500/30';
+        if (msg.role === 'Co-Leader') roleBadgeColor = 'bg-fuchsia-500/20 text-clash-elixir border-fuchsia-500/30';
+        if (msg.role === 'Elder') roleBadgeColor = 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30';
+
+        return `
+          <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span class="text-xs font-clash ${isMe ? 'text-clash-gold' : 'text-slate-200'}">${escapeHtml(msg.sender)}</span>
+              <span class="text-[9px] uppercase font-bold px-1.5 py-0.2 rounded border ${roleBadgeColor}">${msg.role}</span>
+              <span class="text-[10px] text-slate-500 ml-1 font-sans">${msg.time}</span>
+            </div>
+            <div class="px-4 py-2.5 rounded-2xl max-w-lg text-xs leading-relaxed ${
+              isMe ? 'bg-amber-500 text-slate-950 font-bold rounded-tr-none shadow-gold-glow' : 'bg-slate-900 border border-slate-800 text-slate-100 rounded-tl-none'
+            }">
+              ${escapeHtml(msg.text)}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      scrollChatToBottom();
       lucide.createIcons();
-
-      if (!currentSignalNodeId && data.length > 0) {
-        activateSignalNode(data[0].id, data[0].name);
-      }
     }
 
-    async function activateSignalNode(nodeId, nodeName) {
-      currentSignalNodeId = nodeId;
-      document.getElementById('active-signal-node').innerHTML = `<i data-lucide="terminal" class="w-4 h-4 text-amber-400"></i> ${nodeName}`;
-      lucide.createIcons();
-
-      synchronizeSignalNodes();
-
-      const { data: messages } = await nexusClient
-        .from('chat_messages')
-        .select('*, profiles(username, role)')
-        .eq('room_id', nodeId)
-        .order('created_at', { ascending: true });
-
-      const stream = document.getElementById('telemetry-stream');
-      stream.innerHTML = '';
-      if (messages) {
-        messages.forEach(msg => appendTelemetryEntry(msg));
-        stream.scrollTop = stream.scrollHeight;
-      }
-
-      if (realtimeChannelSubscription) nexusClient.removeChannel(realtimeChannelSubscription);
-
-      realtimeChannelSubscription = nexusClient
-        .channel(`relay:${nodeId}`)
-        .on(
-          'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `room_id=eq.${nodeId}` },
-          async (payload) => {
-            const { data: profile } = await nexusClient.from('profiles').select('username, role').eq('id', payload.new.user_id).single();
-            appendTelemetryEntry({ ...payload.new, profiles: profile });
-            stream.scrollTop = stream.scrollHeight;
-          }
-        )
-        .subscribe();
+    function scrollChatToBottom() {
+      const container = document.getElementById('chat-messages-container');
+      container.scrollTop = container.scrollHeight;
     }
 
-    function appendTelemetryEntry(msg) {
-      const stream = document.getElementById('telemetry-stream');
-      const row = document.createElement('div');
-      const isOrigin = operativeIdentity && msg.user_id === operativeIdentity.id;
-
-      row.className = `flex flex-col ${isOrigin ? 'items-end' : 'items-start'}`;
-      row.innerHTML = `
-        <div class="flex items-center gap-1.5 mb-0.5">
-          <span class="text-[10px] font-mono font-bold ${isOrigin ? 'text-amber-400' : 'text-slate-300'}">${msg.profiles?.username || 'ANONYMOUS'}</span>
-          <span class="text-[8px] font-mono uppercase bg-slate-800 text-slate-400 px-1 rounded">${msg.profiles?.role || 'OPERATIVE'}</span>
-        </div>
-        <div class="px-3 py-1.5 rounded-lg max-w-sm text-xs ${
-          isOrigin ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-100 border border-slate-700'
-        }">
-          ${sanitizeTelemetry(msg.content)}
-        </div>
-      `;
-      stream.appendChild(row);
-    }
-
-    async function dispatchTransmission(e) {
+    function handleSendChatMessage(e) {
       e.preventDefault();
-      if (!nexusClient || !operativeIdentity || !currentSignalNodeId) return;
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
 
-      const input = document.getElementById('transmission-buffer');
-      const content = input.value.trim();
-      if (!content) return;
+      SoundFx.play('ping');
+
+      const newMsg = {
+        id: 'msg-' + Date.now(),
+        sender: activeChieftain.name,
+        role: activeChieftain.role,
+        text: text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      if (!messages[activeChannel]) messages[activeChannel] = [];
+      messages[activeChannel].push(newMsg);
+      localStorage.setItem('COC_CHAT_STORE', JSON.stringify(messages));
 
       input.value = '';
-      await nexusClient.from('chat_messages').insert({
-        room_id: currentSignalNodeId,
-        user_id: operativeIdentity.id,
-        content
-      });
+      renderChatMessages();
     }
 
-    async function executeRoomGenesis() {
-      if (!operativeIdentity) return openAuthenticationModal('signin');
-      const name = prompt("SIGNAL NODE IDENTIFIER:");
+    function promptNewChannel() {
+      const name = prompt("Enter war channel identifier (e.g. cwl-hits):");
       if (!name) return;
-
-      const sanitized = name.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
-      await nexusClient.from('chat_rooms').insert({
-        name: sanitized,
-        created_by: operativeIdentity.id
-      });
-      synchronizeSignalNodes();
+      const clean = name.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+      if (!channels.includes(clean)) {
+        channels.push(clean);
+        messages[clean] = [];
+        localStorage.setItem('COC_CHANNELS', JSON.stringify(channels));
+        renderChannelList();
+        selectChannel(clean);
+        showToast(`Created channel #${clean}`, 'success');
+      }
     }
 
-    function sanitizeTelemetry(str) {
+    function simulateClanmateChatter() {
+      SoundFx.play('ping');
+      const bots = [
+        { sender: 'ArcherQueenMain', role: 'Elder', text: 'Enemy Base #8 has clan castle lava hound. Bring poison!' },
+        { sender: 'LaloGrandmaster', role: 'Co-Leader', text: 'Spells brewed and ready. Going in for attack in 5 minutes!' },
+        { sender: 'ElectroChieftain', role: 'Member', text: 'Donated max Super Dragons to everyone on war war roster!' }
+      ];
+      const randomMsg = bots[Math.floor(Math.random() * bots.length)];
+      randomMsg.time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      if (!messages[activeChannel]) messages[activeChannel] = [];
+      messages[activeChannel].push(randomMsg);
+      localStorage.setItem('COC_CHAT_STORE', JSON.stringify(messages));
+      renderChatMessages();
+    }
+
+    // --- TOAST NOTIFICATIONS ---
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let border = 'border-amber-500/40 text-amber-200';
+      if (type === 'success') border = 'border-emerald-500/40 text-emerald-200';
+
+      toast.className = `pointer-events-auto flex items-center space-x-2.5 px-4 py-3 rounded-xl bg-slate-900/95 border ${border} shadow-2xl text-xs font-sans transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full ${type === 'success' ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
+        <span class="font-bold">${escapeHtml(message)}</span>
+      `;
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.remove('translate-y-2', 'opacity-0'));
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 350);
+      }, 3500);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
       const div = document.createElement('div');
       div.innerText = str;
       return div.innerHTML;
