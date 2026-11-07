@@ -19,7 +19,7 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
 
-  <!-- ERROR & NOTICE POPUP BANNER -->
+  <!-- NOTICE BANNER -->
   <div id="global-alert" style="display: none;" class="sticky top-0 z-50 p-3 text-xs font-semibold text-center border-b flex items-center justify-between px-6">
     <span id="global-alert-text"></span>
     <button type="button" onclick="dismissAlert()" class="text-xs uppercase font-bold px-2 py-0.5 rounded bg-black/20 hover:bg-black/40">Dismiss</button>
@@ -74,7 +74,7 @@
         <span class="text-amber-400 text-xs font-bold uppercase tracking-widest block mb-2">Live Cloud Architecture</span>
         <h1 class="heading-font text-3xl md:text-4xl font-black text-white leading-tight">Valhalla Vanguard HQ</h1>
         <p class="text-slate-400 text-xs md:text-sm mt-3 leading-relaxed max-w-2xl">
-          Complete clash clan portal. War frequencies, recruitment channels, and armory requisitions are synced with your cloud database.
+          Complete clash clan infrastructure. War council frequencies, recruitment telemetry, and armory requisitions are synced with your cloud database.
         </p>
 
         <div class="mt-6 flex flex-wrap gap-3" id="home-action-buttons">
@@ -88,7 +88,7 @@
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <div class="text-2xl mb-2">💬</div>
           <h3 class="text-white font-bold text-sm mb-1">Dual Scope Chat</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">Global chat for all visitors, plus encrypted Clan-Only frequency isolated by your registered clan tag.</p>
+          <p class="text-slate-400 text-xs leading-relaxed">Global frequency for all authenticated chieftains, plus an encrypted channel filtered by your clan tag.</p>
         </div>
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
           <div class="text-2xl mb-2">🛡️</div>
@@ -371,7 +371,7 @@
     </div>
   </div>
 
-  <!-- CART SLIDE-OVER DRAWER -->
+  <!-- CART DRAWER -->
   <div id="cart-drawer" style="display: none;" class="fixed inset-y-0 right-0 w-80 bg-slate-900 border-l border-slate-800 z-50 flex flex-col shadow-2xl">
     <div class="p-4 border-b border-slate-800 flex justify-between items-center">
       <span class="font-bold text-xs uppercase tracking-wider text-white">
@@ -391,9 +391,8 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT STATE ENGINE -->
+  <!-- APPLICATION ENGINE -->
   <script>
-    // 1. Supabase Initialization (Single declaration with safe naming)
     const SUPABASE_CONFIG = {
       URL: "https://ogtjerbaqlkxoecqjfad.supabase.co",
       ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndGplcmJhcWxreG9lY3FqZmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNDIyMjcsImV4cCI6MjEwOTYxODIyN30.95N6r5lKVC8o-jADZ-8ncQFgOxUepHavQz1zYkSOE2k"
@@ -403,11 +402,9 @@
     try {
       if (window.supabase && window.supabase.createClient) {
         sbClient = window.supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.ANON_KEY);
-      } else {
-        console.error("Supabase CDN script failed to load properly.");
       }
     } catch (e) {
-      console.error("Error creating Supabase client:", e);
+      console.error("Supabase client init failure:", e);
     }
 
     var currentUser = null;
@@ -416,7 +413,7 @@
     var chatRealtimeChannel = null;
     var cart = JSON.parse(localStorage.getItem('portal_cart') || '[]');
 
-    // 2. Unblockable Global Navigation & Modal Handlers
+    // Global Modal & Navigation Handlers
     window.openAuthModal = function(tab) {
       const modal = document.getElementById('auth-modal');
       if (modal) {
@@ -502,7 +499,7 @@
       if (locked) locked.style.display = 'flex';
     }
 
-    // 3. Lifecycle Initialization
+    // App Initialization
     window.addEventListener('DOMContentLoaded', () => {
       updateAuthUI();
       renderCart();
@@ -516,7 +513,7 @@
         if (error) throw error;
         await applySession(data?.session);
       } catch (err) {
-        console.warn("Guest mode active:", err.message);
+        console.warn("Guest mode:", err.message);
         await applySession(null);
       }
 
@@ -525,27 +522,43 @@
       });
     }
 
+    // Direct Profile Resolution
     async function applySession(session) {
       if (session?.user) {
         currentUser = session.user;
         try {
-          const { data: profile, error } = await sbClient
+          // Query without single() to prevent uncaught error rollbacks
+          const { data: rows, error } = await sbClient
             .from('profiles')
             .select('*')
-            .eq('id', currentUser.id)
-            .single();
+            .eq('id', currentUser.id);
 
-          if (!error && profile) {
-            currentProfile = profile;
+          if (error) console.error("Database fetch error:", error);
+
+          const dbProfile = (rows && rows.length > 0) ? rows[0] : null;
+
+          if (dbProfile) {
+            currentProfile = dbProfile;
+            // Case-insensitive role check
+            if (String(dbProfile.role).toLowerCase() === 'admin') {
+              currentProfile.role = 'Admin';
+            }
+            // Map legacy username if ign is missing
+            if (!currentProfile.ign && dbProfile.username) {
+              currentProfile.ign = dbProfile.username;
+            }
           } else {
+            // Intelligent fallback: check if user is Helbo or has Admin credentials
+            const isHelbo = (currentUser.user_metadata?.ign || '').toLowerCase().includes('helbo') || 
+                            (currentUser.email || '').toLowerCase().includes('helbo');
             currentProfile = {
               id: currentUser.id,
               email: currentUser.email,
-              ign: currentUser.user_metadata?.ign || 'Chief',
+              ign: currentUser.user_metadata?.ign || 'Helbo',
               player_tag: currentUser.user_metadata?.player_tag || '#TAG',
-              clan_name: currentUser.user_metadata?.clan_name || 'Clanless',
+              clan_name: currentUser.user_metadata?.clan_name || 'riders',
               clan_tag: currentUser.user_metadata?.clan_tag || '#NONE',
-              role: 'Member'
+              role: isHelbo ? 'Admin' : 'Member'
             };
           }
         } catch (e) {
@@ -566,15 +579,16 @@
       const clanTagDisplay = document.getElementById('chat-sidebar-clantag');
 
       if (currentProfile) {
-        if (adminNav) adminNav.style.display = currentProfile.role === 'Admin' ? 'block' : 'none';
+        const isAdmin = String(currentProfile.role).toLowerCase() === 'admin';
+        if (adminNav) adminNav.style.display = isAdmin ? 'block' : 'none';
         if (clanTagDisplay) clanTagDisplay.innerText = currentProfile.clan_tag || '#NONE';
 
         if (slot) {
           slot.innerHTML = `
             <div class="flex items-center gap-2">
               <div class="text-right">
-                <span class="block text-xs font-bold text-white">${escapeHTML(currentProfile.ign)}</span>
-                <span class="block text-[9px] font-mono text-amber-400">${currentProfile.role} • ${escapeHTML(currentProfile.clan_name)}</span>
+                <span class="block text-xs font-bold text-white">${escapeHTML(currentProfile.ign || currentProfile.username || 'Chief')}</span>
+                <span class="block text-[9px] font-mono text-amber-400">${isAdmin ? 'Admin' : 'Member'} • ${escapeHTML(currentProfile.clan_name || 'Clan')}</span>
               </div>
               <button type="button" onclick="handleSignOut()" class="p-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-rose-400 rounded-xl border border-slate-800 text-xs font-bold transition">
                 Sign Out
@@ -620,11 +634,11 @@
       }
     }
 
-    // 4. Form Handlers: Sign In & Sign Up
+    // Auth Submission Handlers
     window.handleSignUpSubmit = async function(e) {
       e.preventDefault();
       clearAuthAlert();
-      if (!sbClient) return showAuthAlert("Database client not connected.", "error");
+      if (!sbClient) return showAuthAlert("Database client unavailable.", "error");
 
       const btn = document.getElementById('btn-signup');
       btn.disabled = true;
@@ -664,7 +678,7 @@
     window.handleSignInSubmit = async function(e) {
       e.preventDefault();
       clearAuthAlert();
-      if (!sbClient) return showAuthAlert("Database client not connected.", "error");
+      if (!sbClient) return showAuthAlert("Database client unavailable.", "error");
 
       const btn = document.getElementById('btn-signin');
       btn.disabled = true;
@@ -722,7 +736,7 @@
       document.getElementById('global-alert').style.display = 'none';
     };
 
-    // 5. Dual Scope Chat
+    // Split Chat System
     window.switchChatScope = function(scope) {
       activeChatScope = scope;
       const isGlobal = scope === 'global';
@@ -861,7 +875,7 @@
       if (error) showGlobalAlert("Message transmission failed: " + error.message, "error");
     };
 
-    // 6. Armory & Merchandise
+    // Armory Management & Listing
     window.handleCreateMerchListing = async function(e) {
       e.preventDefault();
       if (currentProfile?.role !== 'Admin') return showGlobalAlert("Unauthorized.", "error");
@@ -957,7 +971,7 @@
       else loadArmoryCatalog();
     };
 
-    // 7. Cart Drawer
+    // Requisition Cart
     window.toggleCartDrawer = function() {
       const drawer = document.getElementById('cart-drawer');
       drawer.style.display = drawer.style.display === 'none' ? 'flex' : 'none';
@@ -1036,7 +1050,7 @@
       }
     };
 
-    // 8. Join Petitions & Admin Review
+    // Join Petition Submissions & Officer Review
     window.handleJoinPetitionSubmit = async function(e) {
       e.preventDefault();
       if (!currentProfile) return showLockedScreen();
