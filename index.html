@@ -403,8 +403,8 @@
       const anon = document.getElementById('cfgAnon').value.trim();
       if (!url || !anon) return alert('Provide both URL and Anon key.');
 
-      localStorage.setItem('COC_SUPABASE_URL', url);
-      localStorage.setItem('COC_SUPABASE_ANON_KEY', anon);
+      localStorage.setItem('https://ogtjerbaqlkxoecqjfad.supabase.co', url);
+      localStorage.setItem('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndGplcmJhcWxreG9lY3FqZmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNDIyMjcsImV4cCI6MjEwOTYxODIyN30.95N6r5lKVC8o-jADZ-8ncQFgOxUepHavQz1zYkSOE2k', anon);
       closeConfigModal();
       initSupabaseFromStorage();
     }
