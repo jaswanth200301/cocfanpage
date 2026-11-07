@@ -317,7 +317,6 @@
 
       if (ep !== "YOUR_SUPABASE_URL_HERE" && ck !== "YOUR_SUPABASE_ANON_KEY_HERE" && ep.startsWith("http")) {
         nexusClient = window.supabase.createClient(ep, ck);
-        document.getElementById('protocol-status-label').innerText = `PROTOCOL LINK: ACTIVE [${new URL(ep).hostname}]`;
         document.getElementById('protocol-ribbon').className = "bg-emerald-600/10 border-b border-emerald-500/20 px-4 py-2 text-xs flex justify-between items-center text-emerald-300";
         
         verifyActiveClearance();
