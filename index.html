@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Valhalla Vanguard | Clan Portal & Armory</title>
+  <title>Valhalla Vanguard | Clan HQ & Armory Portal</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -63,21 +63,24 @@
         <button onclick="navigate('admin')" id="nav-admin" class="nav-btn hidden px-4 py-2 rounded-lg text-amber-400 hover:text-white transition">Admin Panel</button>
       </nav>
 
-      <!-- User & Cart Section -->
+      <!-- Cart & User Identity -->
       <div class="flex items-center gap-3">
         <button onclick="toggleCartDrawer()" class="relative p-2.5 rounded-xl bg-brand-surface hover:bg-slate-800 text-slate-300 border border-brand-border transition">
           <i data-lucide="shopping-bag" class="w-4 h-4"></i>
           <span id="cart-counter" class="absolute -top-1 -right-1 bg-amber-500 text-slate-950 font-extrabold rounded-full w-4 h-4 text-[10px] flex items-center justify-center">0</span>
         </button>
 
+        <!-- Static Fallback UI (Ensures Button Appears Immediately Even If Network Latency Occurs) -->
         <div id="auth-header-slot">
-          <!-- Handled by updateAuthUI() -->
+          <button onclick="openAuthModal('signin')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs uppercase tracking-wider transition">
+            Sign In / Register
+          </button>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- MAIN VIEWPORT -->
+  <!-- MAIN CANVAS -->
   <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1 flex flex-col">
 
     <!-- VIEW 1: HOME PAGE -->
@@ -90,7 +93,9 @@
         </p>
 
         <div class="mt-6 flex flex-wrap gap-3" id="home-action-buttons">
-          <!-- Populated by JS based on session -->
+          <button onclick="openAuthModal('signup')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2">
+            <i data-lucide="user-plus" class="w-4 h-4"></i> Register Chieftain Profile
+          </button>
         </div>
       </div>
 
@@ -150,7 +155,7 @@
           </div>
         </div>
 
-        <!-- Chat Main Canvas -->
+        <!-- Chat Conversation Canvas -->
         <div class="flex-1 flex flex-col bg-brand-card">
           <div class="px-5 py-3 border-b border-brand-border flex justify-between items-center bg-slate-950/30">
             <div>
@@ -162,9 +167,7 @@
             <div id="current-user-role-badge" class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-amber-400 border border-slate-700"></div>
           </div>
 
-          <div id="messages-container" class="flex-1 overflow-y-auto p-5 space-y-3">
-            <!-- Messages stream here -->
-          </div>
+          <div id="messages-container" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
 
           <form onsubmit="handleMessageSubmit(event)" class="p-3 border-t border-brand-border bg-slate-950 flex gap-2">
             <input id="chat-text-input" type="text" placeholder="Transmit message..." class="flex-1 bg-slate-900 border border-brand-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
@@ -244,7 +247,7 @@
       </div>
     </section>
 
-    <!-- VIEW 5: CLAN ARMORY (STORE) -->
+    <!-- VIEW 5: CLAN ARMORY (STORE - NO PREFAB) -->
     <section id="view-armory" class="view-panel hidden space-y-6">
       <div class="flex justify-between items-center">
         <div>
@@ -253,9 +256,7 @@
         </div>
       </div>
 
-      <div id="armory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Rendered dynamically from Supabase public.merchandise -->
-      </div>
+      <div id="armory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
 
     <!-- VIEW 6: ADMIN CONTROL PANEL -->
@@ -267,7 +268,7 @@
           <i data-lucide="plus-circle" class="w-5 h-5 text-amber-400"></i>
           <h2 class="heading-font text-lg font-bold text-white">List New Armory Merchandise</h2>
         </div>
-        <p class="text-xs text-slate-400">Add physical gear or collectibles to the Armory store. Items are written directly to the database.</p>
+        <p class="text-xs text-slate-400">Add physical gear or collectibles to the Armory store. Items are written directly to the Supabase database.</p>
 
         <form id="admin-merch-form" onsubmit="handleCreateMerchListing(event)" class="space-y-4 pt-2">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -294,7 +295,7 @@
         </form>
       </div>
 
-      <!-- SUBSECTION 2: REVIEW ENLISTMENT PETITIONS -->
+      <!-- SUBSECTION 2: REVIEW PETITIONS -->
       <div class="bg-brand-card border border-brand-border rounded-2xl overflow-hidden">
         <div class="p-4 border-b border-brand-border flex justify-between items-center bg-slate-950/40">
           <div class="flex items-center gap-2">
@@ -315,9 +316,7 @@
               <th class="p-3.5 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody id="admin-petitions-tbody" class="divide-y divide-brand-border font-mono">
-            <!-- Loaded dynamically from Supabase -->
-          </tbody>
+          <tbody id="admin-petitions-tbody" class="divide-y divide-brand-border font-mono"></tbody>
         </table>
       </div>
 
@@ -353,7 +352,7 @@
         </button>
       </form>
 
-      <!-- Sign Up Form (Clan metadata included; NO admin tickbox) -->
+      <!-- Sign Up Form (Metadata captured; NO admin checkbox) -->
       <form id="signup-form" onsubmit="handleSignUpSubmit(event)" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Email Address *</label>
@@ -421,7 +420,6 @@
 
   <!-- APPLICATION LOGIC -->
   <script>
-    // Supabase Credentials
     const SUPABASE_CONFIG = {
       URL: "https://ogtjerbaqlkxoecqjfad.supabase.co",
       ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ndGplcmJhcWxreG9lY3FqZmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwNDIyMjcsImV4cCI6MjEwOTYxODIyN30.95N6r5lKVC8o-jADZ-8ncQFgOxUepHavQz1zYkSOE2k"
@@ -429,23 +427,32 @@
 
     const supabase = window.supabase.createClient(SUPABASE_CONFIG.URL, SUPABASE_CONFIG.ANON_KEY);
 
-    // Global App State
     let currentUser = null;
     let currentProfile = null;
-    let activeChatScope = 'global'; // 'global' or 'clan'
+    let activeChatScope = 'global';
     let chatRealtimeChannel = null;
     let cart = JSON.parse(localStorage.getItem('portal_cart') || '[]');
 
-    window.addEventListener('DOMContentLoaded', async () => {
-      lucide.createIcons();
-      await checkActiveSession();
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Instantly render initial UI and icons with zero delay
+      updateAuthUI();
       renderCart();
+      try { if (window.lucide) lucide.createIcons(); } catch(e) {}
+
+      // 2. Safely perform session check in background
+      checkActiveSession();
     });
 
     // 1. Session Management
     async function checkActiveSession() {
-      const { data: { session } } = await supabase.auth.getSession();
-      await applySession(session);
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        await applySession(data?.session);
+      } catch (err) {
+        console.warn("Session check returned guest mode:", err.message);
+        await applySession(null);
+      }
 
       supabase.auth.onAuthStateChange(async (_event, session) => {
         await applySession(session);
@@ -455,12 +462,29 @@
     async function applySession(session) {
       if (session?.user) {
         currentUser = session.user;
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', currentUser.id)
-          .single();
-        currentProfile = profile;
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .single();
+
+          if (!error && profile) {
+            currentProfile = profile;
+          } else {
+            currentProfile = {
+              id: currentUser.id,
+              email: currentUser.email,
+              ign: currentUser.user_metadata?.ign || 'Chief',
+              player_tag: currentUser.user_metadata?.player_tag || '#TAG',
+              clan_name: currentUser.user_metadata?.clan_name || 'Clanless',
+              clan_tag: currentUser.user_metadata?.clan_tag || '#NONE',
+              role: 'Member'
+            };
+          }
+        } catch (e) {
+          console.error("Profile resolution error:", e);
+        }
       } else {
         currentUser = null;
         currentProfile = null;
@@ -476,51 +500,59 @@
       const clanTagDisplay = document.getElementById('chat-sidebar-clantag');
 
       if (currentProfile) {
-        adminNav.classList.toggle('hidden', currentProfile.role !== 'Admin');
-        clanTagDisplay.innerText = currentProfile.clan_tag || '#NONE';
+        if (adminNav) adminNav.classList.toggle('hidden', currentProfile.role !== 'Admin');
+        if (clanTagDisplay) clanTagDisplay.innerText = currentProfile.clan_tag || '#NONE';
 
-        slot.innerHTML = `
-          <div class="flex items-center gap-2">
-            <div class="text-right">
-              <span class="block text-xs font-bold text-white">${escapeHTML(currentProfile.ign)}</span>
-              <span class="block text-[9px] font-mono text-amber-400">${currentProfile.role} • ${escapeHTML(currentProfile.clan_name)}</span>
+        if (slot) {
+          slot.innerHTML = `
+            <div class="flex items-center gap-2">
+              <div class="text-right">
+                <span class="block text-xs font-bold text-white">${escapeHTML(currentProfile.ign)}</span>
+                <span class="block text-[9px] font-mono text-amber-400">${currentProfile.role} • ${escapeHTML(currentProfile.clan_name)}</span>
+              </div>
+              <button onclick="handleSignOut()" class="p-2 bg-brand-surface hover:bg-slate-800 text-slate-400 hover:text-rose-400 rounded-xl border border-brand-border transition" title="Sign Out">
+                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+              </button>
             </div>
-            <button onclick="handleSignOut()" class="p-2 bg-brand-surface hover:bg-slate-800 text-slate-400 hover:text-rose-400 rounded-xl border border-brand-border transition" title="Sign Out">
-              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-        `;
+          `;
+        }
 
         if (roleBadge) {
           roleBadge.innerText = `${currentProfile.role} • ${currentProfile.ign}`;
         }
 
-        homeActionButtons.innerHTML = `
-          <button onclick="navigate('chat')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2">
-            <i data-lucide="messages-square" class="w-4 h-4"></i> Enter War Chat
-          </button>
-          <button onclick="navigate('join')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider border border-slate-700 transition">
-            Submit Join Petition
-          </button>
-          <button onclick="navigate('armory')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider border border-slate-700 transition">
-            Browse Armory
-          </button>
-        `;
+        if (homeActionButtons) {
+          homeActionButtons.innerHTML = `
+            <button onclick="navigate('chat')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2">
+              <i data-lucide="messages-square" class="w-4 h-4"></i> Enter War Chat
+            </button>
+            <button onclick="navigate('join')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider border border-slate-700 transition">
+              Submit Join Petition
+            </button>
+            <button onclick="navigate('armory')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider border border-slate-700 transition">
+              Browse Armory
+            </button>
+          `;
+        }
       } else {
-        adminNav.classList.add('hidden');
-        slot.innerHTML = `
-          <button onclick="openAuthModal('signin')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs uppercase tracking-wider transition">
-            Sign In / Register
-          </button>
-        `;
+        if (adminNav) adminNav.classList.add('hidden');
+        if (slot) {
+          slot.innerHTML = `
+            <button onclick="openAuthModal('signin')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs uppercase tracking-wider transition">
+              Sign In / Register
+            </button>
+          `;
+        }
 
-        homeActionButtons.innerHTML = `
-          <button onclick="openAuthModal('signup')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2">
-            <i data-lucide="user-plus" class="w-4 h-4"></i> Register Chieftain Profile
-          </button>
-        `;
+        if (homeActionButtons) {
+          homeActionButtons.innerHTML = `
+            <button onclick="openAuthModal('signup')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2">
+              <i data-lucide="user-plus" class="w-4 h-4"></i> Register Chieftain Profile
+            </button>
+          `;
+        }
       }
-      lucide.createIcons();
+      try { if (window.lucide) lucide.createIcons(); } catch(e) {}
     }
 
     // 2. Navigation Routing & Security
@@ -708,7 +740,7 @@
         ? "Open discussion across all visiting chieftains"
         : "Encrypted frequency restricted strictly to your clan mates";
 
-      lucide.createIcons();
+      try { if (window.lucide) lucide.createIcons(); } catch(e) {}
       initChat();
     }
 
@@ -727,7 +759,6 @@
           { event: 'INSERT', schema: 'public', table: 'chat_messages' },
           async (payload) => {
             const newMsg = payload.new;
-            // Filter incoming realtime message by active scope
             if (activeChatScope === 'global' && newMsg.chat_type === 'global') {
               await appendSingleMessage(newMsg);
             } else if (activeChatScope === 'clan' && newMsg.chat_type === 'clan' && newMsg.clan_tag === currentProfile.clan_tag) {
@@ -763,7 +794,7 @@
             <p class="text-[11px] text-slate-500 mt-0.5">Transmit a command to open communications.</p>
           </div>
         `;
-        lucide.createIcons();
+        try { if (window.lucide) lucide.createIcons(); } catch(e) {}
         return;
       }
 
@@ -884,7 +915,7 @@
             ` : ''}
           </div>
         `;
-        lucide.createIcons();
+        try { if (window.lucide) lucide.createIcons(); } catch(e) {}
         return;
       }
 
@@ -917,7 +948,7 @@
         `;
         grid.appendChild(card);
       });
-      lucide.createIcons();
+      try { if (window.lucide) lucide.createIcons(); } catch(e) {}
     }
 
     async function deleteMerchListing(id) {
@@ -974,7 +1005,7 @@
 
       document.getElementById('cart-subtotal-val').innerText = `$${sum.toFixed(2)}`;
       document.getElementById('cart-counter').innerText = count;
-      lucide.createIcons();
+      try { if (window.lucide) lucide.createIcons(); } catch(e) {}
     }
 
     function removeFromCart(id) {
