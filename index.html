@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clan Portal & Community Hub</title>
+  <title>Clan HQ & Armory Portal</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -14,10 +14,11 @@
             brand: {
               gold: '#F59E0B',
               darkgold: '#B45309',
-              elixir: '#9333EA',
-              dark: '#0B0F19',
-              card: '#111827',
-              border: '#1F2937'
+              dark: '#080C14',
+              surface: '#0F172A',
+              card: '#131D31',
+              border: '#1E293B',
+              accent: '#DC2626'
             }
           }
         }
@@ -25,166 +26,140 @@
     }
   </script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .heading-font { font-family: 'Cinzel', serif; }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #0B0F19; }
-    ::-webkit-scrollbar-thumb { background: #1F2937; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #374151; }
+    ::-webkit-scrollbar-track { background: #080C14; }
+    ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
   </style>
 </head>
 <body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-black">
 
-  <!-- TOP STATUS / ANNOUNCEMENT BAR -->
-  <div class="bg-slate-900/80 border-b border-slate-800 text-[11px] py-1.5 px-4 text-slate-400 flex justify-between items-center">
-    <div class="flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      <span id="system-status-indicator">Clan Portal Engine Active • Local Storage Mode</span>
-    </div>
-    <div class="flex items-center gap-3">
-      <span id="role-switch-indicator" class="text-amber-400 font-medium">Role: Guest</span>
-      <button onclick="toggleAdminPreview()" class="text-slate-400 hover:text-white underline text-[10px] uppercase font-bold tracking-wider">
-        Toggle Officer Access
-      </button>
-    </div>
-  </div>
-
-  <!-- NAVIGATION HEADER -->
-  <header class="bg-slate-950/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur">
+  <!-- HEADER -->
+  <header class="bg-slate-950/90 border-b border-brand-border sticky top-0 z-40 backdrop-blur">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       
       <!-- Brand Logo -->
-      <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('home')">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('home')">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/10">
           <i data-lucide="shield" class="w-5 h-5 text-slate-950"></i>
         </div>
         <div>
           <span class="heading-font text-base font-black tracking-wider text-white block">CLAN PORTAL</span>
-          <span class="text-[10px] font-mono text-amber-400 tracking-widest block uppercase">COMMUNITY HUB</span>
+          <span class="text-[9px] font-mono text-amber-400 tracking-widest block uppercase">ENTERPRISE HUB</span>
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
-      <nav class="hidden md:flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
-        <button onclick="switchView('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-lg bg-amber-500 text-slate-950 transition">Home</button>
-        <button onclick="switchView('chat')" id="nav-chat" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">Clan Chat</button>
-        <button onclick="switchView('join')" id="nav-join" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">Join Clan</button>
-        <button onclick="switchView('armory')" id="nav-armory" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">Armory Store</button>
-        <button onclick="switchView('admin')" id="nav-admin" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">Review Desk</button>
+      <!-- Protected Navigation Tabs -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-brand-border text-xs font-semibold">
+        <button onclick="navigate('home')" id="nav-home" class="nav-btn px-4 py-2 rounded-lg bg-amber-500 text-slate-950 transition">Home</button>
+        <button onclick="navigate('chat')" id="nav-chat" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">Clan Chat</button>
+        <button onclick="navigate('join')" id="nav-join" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">Join Clan</button>
+        <button onclick="navigate('armory')" id="nav-armory" class="nav-btn px-4 py-2 rounded-lg text-slate-400 hover:text-white transition">Armory Store</button>
+        <button onclick="navigate('admin')" id="nav-admin" class="nav-btn hidden px-4 py-2 rounded-lg text-amber-400 hover:text-white transition">Admin Panel</button>
       </nav>
 
-      <!-- Cart & User Identity -->
+      <!-- User & Cart Section -->
       <div class="flex items-center gap-3">
-        <button onclick="toggleCartDrawer()" class="relative p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+        <button onclick="toggleCartDrawer()" class="relative p-2.5 rounded-xl bg-brand-surface hover:bg-slate-800 text-slate-300 border border-brand-border transition">
           <i data-lucide="shopping-bag" class="w-4 h-4"></i>
           <span id="cart-counter" class="absolute -top-1 -right-1 bg-amber-500 text-slate-950 font-extrabold rounded-full w-4 h-4 text-[10px] flex items-center justify-center">0</span>
         </button>
 
         <div id="auth-header-slot">
-          <!-- Populated dynamically: Login button or user menu -->
+          <!-- Populated by JS -->
         </div>
       </div>
     </div>
   </header>
 
-  <!-- MAIN VIEWPORT CANVAS -->
-  <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1">
+  <!-- MAIN CANVAS -->
+  <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1 flex flex-col">
 
-    <!-- VIEW 1: HOME DASHBOARD -->
+    <!-- VIEW 1: HOME PAGE -->
     <section id="view-home" class="view-panel space-y-6">
-      <div class="bg-gradient-to-r from-slate-900 via-slate-900/80 to-amber-950/30 border border-slate-800 rounded-2xl p-6 md:p-10 relative overflow-hidden">
-        <div class="max-w-2xl relative z-10">
-          <span class="text-amber-400 text-xs font-bold uppercase tracking-widest block mb-2">Official Clan Headquarters</span>
-          <h1 class="heading-font text-3xl md:text-4xl font-black text-white leading-tight">Coordinate. Conquer. Collect.</h1>
-          <p class="text-slate-400 text-sm mt-3 leading-relaxed">
-            Register your chieftain profile to gain access to real-time war room discussions, submit recruitment credentials, and purchase authentic clan merchandise.
-          </p>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <button onclick="switchView('chat')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2">
-              <i data-lucide="messages-square" class="w-4 h-4"></i> Enter War Chat
-            </button>
-            <button onclick="switchView('join')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider border border-slate-700 transition">
-              Submit Join Petition
-            </button>
-          </div>
+      <div class="bg-gradient-to-r from-slate-950 via-brand-card to-amber-950/20 border border-brand-border rounded-2xl p-6 md:p-10">
+        <span class="text-amber-400 text-xs font-bold uppercase tracking-widest block mb-2">Authenticated Clan Management</span>
+        <h1 class="heading-font text-3xl md:text-4xl font-black text-white leading-tight">Elite War Headquarters</h1>
+        <p class="text-slate-400 text-xs md:text-sm mt-3 leading-relaxed max-w-2xl">
+          Welcome to the portal. In accordance with operational security, all war telemetry, recruitment channels, group chat, and armory listings require verified credentials.
+        </p>
+
+        <div class="mt-6 flex flex-wrap gap-3" id="home-action-buttons">
+          <!-- Populated based on auth state -->
         </div>
       </div>
 
-      <!-- Feature Grid -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-brand-card border border-brand-border rounded-2xl p-6">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
-            <i data-lucide="message-circle" class="w-5 h-5"></i>
-          </div>
-          <h3 class="text-white font-bold text-base mb-1">Authenticated Group Chat</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">
-            Create custom rooms, plan attack allocations, and converse with verified clan members under your registered player tag.
-          </p>
+          <i data-lucide="lock" class="w-6 h-6 text-amber-400 mb-3"></i>
+          <h3 class="text-white font-bold text-sm mb-1">Authenticated Chat</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">Only authenticated chiefs can view, create rooms, or broadcast tactical messages.</p>
         </div>
-
         <div class="bg-brand-card border border-brand-border rounded-2xl p-6">
-          <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-4">
-            <i data-lucide="file-check-2" class="w-5 h-5"></i>
-          </div>
-          <h3 class="text-white font-bold text-base mb-1">Recruitment Gate</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">
-            Prospective members submit offensive metrics, war stars, and Town Hall levels. Leadership reviews applications directly on the review desk.
-          </p>
+          <i data-lucide="store" class="w-6 h-6 text-amber-400 mb-3"></i>
+          <h3 class="text-white font-bold text-sm mb-1">Zero Pre-Fab Store</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">Store starts completely empty until an Admin lists verified physical inventory.</p>
         </div>
-
         <div class="bg-brand-card border border-brand-border rounded-2xl p-6">
-          <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-4">
-            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
-          </div>
-          <h3 class="text-white font-bold text-base mb-1">Armory Logistics</h3>
-          <p class="text-slate-400 text-xs leading-relaxed">
-            Equip custom clan hoodies, high-density battlemats, and collector sculptures with a live order checkout flow.
-          </p>
+          <i data-lucide="user-check" class="w-6 h-6 text-amber-400 mb-3"></i>
+          <h3 class="text-white font-bold text-sm mb-1">Full Profile Tracking</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">Tracks current clan name and tag, in-game name, and administrative privileges.</p>
         </div>
       </div>
     </section>
 
-    <!-- VIEW 2: GROUP CHAT (AUTHENTICATED) -->
+    <!-- VIEW 2: AUTH-LOCKED RESTRICTION WALL -->
+    <section id="view-locked" class="view-panel hidden flex-1 flex items-center justify-center py-12">
+      <div class="bg-brand-card border border-brand-border max-w-md w-full p-8 rounded-2xl text-center space-y-4 shadow-xl">
+        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 mx-auto flex items-center justify-center">
+          <i data-lucide="shield-alert" class="w-6 h-6"></i>
+        </div>
+        <h2 class="text-lg font-bold text-white uppercase tracking-wider">Access Denied</h2>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          This division requires an authenticated chieftain session. Anonymous viewing of internal clan communications and assets is forbidden.
+        </p>
+        <button onclick="openAuthModal('signin')" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition">
+          Sign In / Register
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 3: CLAN CHAT (STRICTLY AUTHENTICATED) -->
     <section id="view-chat" class="view-panel hidden">
       <div class="bg-brand-card border border-brand-border rounded-2xl h-[calc(100vh-13rem)] flex overflow-hidden">
         
         <!-- Channels Sidebar -->
-        <div class="w-64 border-r border-brand-border flex flex-col bg-slate-950/60">
+        <div class="w-64 border-r border-brand-border flex flex-col bg-slate-950/70">
           <div class="p-3.5 border-b border-brand-border flex justify-between items-center">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">War Rooms</span>
             <button onclick="promptNewRoom()" class="p-1 hover:bg-slate-800 text-slate-400 hover:text-white rounded transition" title="Create Room">
               <i data-lucide="plus" class="w-4 h-4"></i>
             </button>
           </div>
-          <div id="room-list-container" class="flex-1 overflow-y-auto p-2 space-y-1">
-            <!-- Dynamic room items -->
-          </div>
+          <div id="room-list-container" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
         </div>
 
-        <!-- Chat Main Canvas -->
+        <!-- Chat Conversation Area -->
         <div class="flex-1 flex flex-col bg-brand-card">
           <div class="px-5 py-3 border-b border-brand-border flex justify-between items-center bg-slate-950/30">
             <div>
               <span id="active-room-display" class="font-bold text-sm text-white flex items-center gap-1.5">
                 <i data-lucide="hash" class="w-4 h-4 text-amber-400"></i> general
               </span>
-              <span id="active-room-desc" class="text-[11px] text-slate-400">Active clan discussion room</span>
+              <span id="active-room-desc" class="text-[11px] text-slate-400">Official clan war coordination</span>
             </div>
-            <span id="chat-auth-alert" class="text-xs text-amber-400 font-semibold"></span>
+            <div id="current-user-role-badge" class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-amber-400 border border-slate-700"></div>
           </div>
 
-          <!-- Message History -->
-          <div id="messages-container" class="flex-1 overflow-y-auto p-5 space-y-3">
-            <!-- Dynamic messages or clean empty state -->
-          </div>
+          <div id="messages-container" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
 
-          <!-- Input Bar -->
           <form onsubmit="handleMessageSubmit(event)" class="p-3 border-t border-brand-border bg-slate-950 flex gap-2">
-            <input id="chat-text-input" type="text" placeholder="Sign in to chat..." class="flex-1 bg-slate-900 border border-brand-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
-            <button type="submit" id="chat-send-btn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 rounded-xl text-xs transition flex items-center gap-1">
+            <input id="chat-text-input" type="text" placeholder="Type transmission..." class="flex-1 bg-slate-900 border border-brand-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500">
+            <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 rounded-xl text-xs transition flex items-center gap-1">
               <i data-lucide="send" class="w-3.5 h-3.5"></i>
             </button>
           </form>
@@ -192,29 +167,40 @@
       </div>
     </section>
 
-    <!-- VIEW 3: JOIN REQUEST FORM -->
+    <!-- VIEW 4: JOIN REQUEST FORM (AUTHENTICATED) -->
     <section id="view-join" class="view-panel hidden space-y-6">
       <div class="max-w-2xl mx-auto bg-brand-card border border-brand-border p-6 md:p-8 rounded-2xl">
         <div class="mb-6">
           <h2 class="heading-font text-xl font-bold text-white">Clan Enlistment Petition</h2>
-          <p class="text-slate-400 text-xs mt-1">Applications are forwarded directly to clan leadership for review.</p>
+          <p class="text-slate-400 text-xs mt-1">Submit your profile directly to clan leadership for review.</p>
         </div>
 
         <form id="join-petition-form" onsubmit="handleJoinPetitionSubmit(event)" class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">In-Game Name (IGN) *</label>
-              <input required id="petition-ign" type="text" placeholder="e.g. ValkyrieMaster" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+              <label class="block text-xs font-bold text-slate-300 mb-1">In-Game Name (IGN)</label>
+              <input required id="petition-ign" type="text" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">Player Tag *</label>
-              <input required id="petition-tag" type="text" placeholder="#89YUV8L2" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-amber-500">
+              <label class="block text-xs font-bold text-slate-300 mb-1">Player Tag</label>
+              <input required id="petition-tag" type="text" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Current Clan Name</label>
+              <input required id="petition-current-clan" type="text" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Current Clan Tag / ID</label>
+              <input required id="petition-current-clan-tag" type="text" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-amber-500">
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">Town Hall Level *</label>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Town Hall Level</label>
               <select id="petition-th" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                 <option value="17">Town Hall 17</option>
                 <option value="16" selected>Town Hall 16</option>
@@ -224,13 +210,13 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">War Stars Count *</label>
+              <label class="block text-xs font-bold text-slate-300 mb-1">War Stars Count</label>
               <input required id="petition-stars" type="number" min="0" placeholder="1250" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-300 mb-1">Attack Specialization</label>
               <select id="petition-spec" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                <option value="Smash Tactics">Smash Tactics</option>
+                <option value="Root Rider Smash">Root Rider Smash</option>
                 <option value="Queen Charge Lalo">Queen Charge Lalo</option>
                 <option value="Super Bowler Walk">Super Bowler Walk</option>
                 <option value="Air / Hydra">Air / Hydra</option>
@@ -240,69 +226,105 @@
 
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-1">Statement to Leadership</label>
-            <textarea id="petition-statement" rows="3" placeholder="Tell officers about your active raid hours, war readiness, and donation habits..." class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+            <textarea id="petition-statement" rows="3" placeholder="Tell officers why you want to join..." class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
           </div>
 
           <button type="submit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-2">
-            <i data-lucide="shield-alert" class="w-4 h-4"></i> Dispatch Application
+            <i data-lucide="send" class="w-4 h-4"></i> Dispatch Petition
           </button>
         </form>
       </div>
     </section>
 
-    <!-- VIEW 4: CLAN ARMORY (MERCH STORE) -->
+    <!-- VIEW 5: CLAN ARMORY (STORE - NO PREFAB) -->
     <section id="view-armory" class="view-panel hidden space-y-6">
-      <div>
-        <h2 class="heading-font text-xl font-bold text-white">Clan Armory</h2>
-        <p class="text-slate-400 text-xs">Custom physical gear and collectibles for clan members.</p>
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="heading-font text-xl font-bold text-white">Clan Armory</h2>
+          <p class="text-slate-400 text-xs">Official merchandise and equipment listed directly by leadership.</p>
+        </div>
       </div>
 
       <div id="armory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Rendered dynamically -->
+        <!-- Rendered purely dynamically; starts completely empty -->
       </div>
     </section>
 
-    <!-- VIEW 5: LEADERSHIP REVIEW DESK -->
-    <section id="view-admin" class="view-panel hidden space-y-6">
-      <div class="flex justify-between items-center">
-        <div>
-          <h2 class="heading-font text-xl font-bold text-white">Officer Review Desk</h2>
-          <p class="text-slate-400 text-xs">Review pending clan enlistment petitions and grant approval.</p>
+    <!-- VIEW 6: ADMIN CONTROL PANEL -->
+    <section id="view-admin" class="view-panel hidden space-y-8">
+      
+      <!-- SUBSECTION 1: CREATE NEW MERCH LISTING -->
+      <div class="bg-brand-card border border-brand-border p-6 rounded-2xl space-y-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-amber-400"></i>
+          <h2 class="heading-font text-lg font-bold text-white">List New Armory Merchandise</h2>
         </div>
-        <button onclick="clearAllPetitions()" class="text-xs text-slate-400 hover:text-rose-400 border border-brand-border px-3 py-1.5 rounded-lg transition">
-          Clear All Records
-        </button>
+        <p class="text-xs text-slate-400">Add physical gear or collectibles to the Armory store. Items appear in the store immediately.</p>
+
+        <form id="admin-merch-form" onsubmit="handleCreateMerchListing(event)" class="space-y-4 pt-2">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Item Title *</label>
+              <input required id="admin-merch-title" type="text" placeholder="e.g. Clan War Jersey" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Price ($ USD) *</label>
+              <input required id="admin-merch-price" type="number" step="0.01" min="0" placeholder="45.00" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Image URL *</label>
+              <input required id="admin-merch-image" type="url" placeholder="https://..." class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Item Description</label>
+            <textarea required id="admin-merch-desc" rows="2" placeholder="Item specs, sizing, materials..." class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+          </div>
+          <button type="submit" class="py-2.5 px-6 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition flex items-center gap-2">
+            <i data-lucide="package-plus" class="w-4 h-4"></i> Publish Item to Armory
+          </button>
+        </form>
       </div>
 
+      <!-- SUBSECTION 2: REVIEW ENLISTMENT PETITIONS -->
       <div class="bg-brand-card border border-brand-border rounded-2xl overflow-hidden">
+        <div class="p-4 border-b border-brand-border flex justify-between items-center bg-slate-950/40">
+          <div class="flex items-center gap-2">
+            <i data-lucide="inbox" class="w-4 h-4 text-amber-400"></i>
+            <h3 class="text-sm font-bold text-white">Prospective Chieftain Petitions</h3>
+          </div>
+          <button onclick="clearPetitions()" class="text-[11px] text-slate-400 hover:text-rose-400 underline">Clear Closed Records</button>
+        </div>
+
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-950 border-b border-brand-border text-slate-400 uppercase text-[10px] tracking-wider">
             <tr>
               <th class="p-3.5">Applicant</th>
+              <th class="p-3.5">Current Clan</th>
               <th class="p-3.5">TH Level</th>
               <th class="p-3.5">War Stars</th>
-              <th class="p-3.5">Specialty</th>
               <th class="p-3.5">Status</th>
               <th class="p-3.5 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody id="petitions-table-body" class="divide-y divide-brand-border font-mono">
+          <tbody id="admin-petitions-tbody" class="divide-y divide-brand-border font-mono">
             <!-- Dynamic rows -->
           </tbody>
         </table>
       </div>
+
     </section>
 
   </main>
 
-  <!-- AUTHENTICATION MODAL (TABS: SIGN IN / SIGN UP) -->
+  <!-- AUTHENTICATION DIALOG (SIGN IN & SIGN UP WITH CLAN DETAILS) -->
   <div id="auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="bg-brand-card border border-brand-border w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
       <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
 
-      <!-- Auth Tabs -->
+      <!-- Auth Mode Switcher -->
       <div class="flex border-b border-brand-border mb-5">
         <button onclick="setAuthTab('signin')" id="auth-tab-signin" class="flex-1 py-2 text-xs font-bold border-b-2 border-amber-500 text-amber-400">Sign In</button>
         <button onclick="setAuthTab('signup')" id="auth-tab-signup" class="flex-1 py-2 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-white">Create Account</button>
@@ -323,12 +345,13 @@
         </button>
       </form>
 
-      <!-- Sign Up Form -->
+      <!-- Sign Up Form (Includes Current Clan Name and Current Clan ID) -->
       <form id="signup-form" onsubmit="handleSignUp(event)" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Email Address *</label>
           <input required id="signup-email" type="email" placeholder="chief@clash.com" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
         </div>
+        
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-1">In-Game Name *</label>
@@ -339,12 +362,31 @@
             <input required id="signup-tag" type="text" placeholder="#89YUV8L2" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-amber-500">
           </div>
         </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Current Clan Name *</label>
+            <input required id="signup-clan-name" type="text" placeholder="Northern Raiders" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Current Clan ID / Tag *</label>
+            <input required id="signup-clan-id" type="text" placeholder="#2P99QVR" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white uppercase focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
         <div>
           <label class="block text-xs font-bold text-slate-300 mb-1">Password *</label>
           <input required id="signup-password" type="password" minlength="6" placeholder="At least 6 characters" class="w-full bg-slate-950 border border-brand-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
         </div>
+
+        <!-- Role Designation Checkbox (First user / Admin creation) -->
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="signup-is-admin" class="rounded bg-slate-950 border-brand-border text-amber-500 focus:ring-0">
+          <label for="signup-is-admin" class="text-[11px] text-slate-400 font-semibold cursor-pointer">Register this account with Administrator privileges</label>
+        </div>
+
         <button type="submit" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition">
-          Complete Registration
+          Create Chieftain Profile
         </button>
       </form>
     </div>
@@ -354,14 +396,14 @@
   <div id="cart-drawer" class="fixed inset-y-0 right-0 w-80 bg-brand-card border-l border-brand-border transform translate-x-full transition-transform duration-200 z-50 flex flex-col shadow-2xl">
     <div class="p-4 border-b border-brand-border flex justify-between items-center">
       <span class="font-bold text-xs uppercase tracking-wider text-white flex items-center gap-2">
-        <i data-lucide="shopping-bag" class="w-4 h-4 text-amber-400"></i> Armory Bag
+        <i data-lucide="shopping-bag" class="w-4 h-4 text-amber-400"></i> Armory Requisition
       </span>
       <button onclick="toggleCartDrawer()" class="text-slate-400 hover:text-white">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
     </div>
     <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-2">
-      <!-- Dynamic cart items -->
+      <!-- Injected -->
     </div>
     <div class="p-4 border-t border-brand-border bg-slate-950 space-y-3">
       <div class="flex justify-between text-xs font-bold font-mono">
@@ -369,31 +411,25 @@
         <span id="cart-subtotal-val" class="text-amber-400">$0.00</span>
       </div>
       <button onclick="checkoutCart()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition">
-        Confirm Requisition
+        Execute Order
       </button>
     </div>
   </div>
 
-  <!-- APPLICATION JAVASCRIPT STATE ENGINE -->
+  <!-- STATE ENGINE -->
   <script>
-    // Master Application State
-    const AppState = {
+    const PortalState = {
       currentUser: JSON.parse(localStorage.getItem('portal_user') || 'null'),
       usersDb: JSON.parse(localStorage.getItem('portal_users_db') || '[]'),
       activeRoomId: 'general',
       rooms: JSON.parse(localStorage.getItem('portal_rooms') || JSON.stringify([
         { id: 'general', name: 'general', desc: 'Main war room discussion' },
-        { id: 'tactics', name: 'tactics', desc: 'Attack strategies & target calls' }
+        { id: 'tactics', name: 'tactics', desc: 'Base attack calls and strategies' }
       ])),
       messages: JSON.parse(localStorage.getItem('portal_messages') || '[]'),
-      joinPetitions: JSON.parse(localStorage.getItem('portal_petitions') || '[]'),
-      cart: JSON.parse(localStorage.getItem('portal_cart') || '[]'),
-      isOfficerMode: localStorage.getItem('portal_officer') === 'true',
-      merchandise: [
-        { id: 'prod_1', title: 'Clan Crest War Hoodie', price: 48.00, image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&auto=format&fit=crop', desc: 'Embroidered heavyweight cotton fleece with clan insignia.' },
-        { id: 'prod_2', title: 'Tactical Battle Desk Mat', price: 29.50, image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop', desc: '900x400mm micro-weave cloth with non-slip rubber base.' },
-        { id: 'prod_3', title: 'Town Hall 16 Collector Bust', price: 85.00, image: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=400&auto=format&fit=crop', desc: 'Hand-painted solid resin monument with illuminated core.' }
-      ]
+      merchandise: JSON.parse(localStorage.getItem('portal_merchandise') || '[]'), // 100% Zero pre-fab
+      petitions: JSON.parse(localStorage.getItem('portal_petitions') || '[]'),
+      cart: JSON.parse(localStorage.getItem('portal_cart') || '[]')
     };
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -406,24 +442,56 @@
       renderCart();
     });
 
-    // 1. Navigation Controller
-    function switchView(viewId) {
+    // 1. Route Navigation & Protection
+    function navigate(viewId) {
+      // Protect internal pages against non-logged in users
+      const protectedViews = ['chat', 'join', 'armory', 'admin'];
+      if (protectedViews.includes(viewId) && !PortalState.currentUser) {
+        showLockedScreen();
+        return;
+      }
+
+      if (viewId === 'admin' && PortalState.currentUser?.role !== 'Admin') {
+        alert("Access restricted: Administrator status required.");
+        return;
+      }
+
       document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
       document.querySelectorAll('.nav-btn').forEach(b => {
         b.classList.remove('bg-amber-500', 'text-slate-950');
         b.classList.add('text-slate-400');
       });
 
-      document.getElementById(`view-${viewId}`).classList.remove('hidden');
+      const target = document.getElementById(`view-${viewId}`);
+      if (target) target.classList.remove('hidden');
+
       const activeNav = document.getElementById(`nav-${viewId}`);
       if (activeNav) {
         activeNav.classList.add('bg-amber-500', 'text-slate-950');
         activeNav.classList.remove('text-slate-400');
       }
+
+      // Pre-fill user details in join petition if logged in
+      if (viewId === 'join' && PortalState.currentUser) {
+        document.getElementById('petition-ign').value = PortalState.currentUser.ign;
+        document.getElementById('petition-tag').value = PortalState.currentUser.tag;
+        document.getElementById('petition-current-clan').value = PortalState.currentUser.clanName || '';
+        document.getElementById('petition-current-clan-tag').value = PortalState.currentUser.clanId || '';
+      }
     }
 
-    // 2. Authentication System (Real Sign-Up & Sign-In)
-    function openAuthModal() {
+    function showLockedScreen() {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(b => {
+        b.classList.remove('bg-amber-500', 'text-slate-950');
+        b.classList.add('text-slate-400');
+      });
+      document.getElementById('view-locked').classList.remove('hidden');
+    }
+
+    // 2. Authentication System (Sign Up & Sign In with Clan Details)
+    function openAuthModal(tab = 'signin') {
+      setAuthTab(tab);
       document.getElementById('auth-modal').classList.remove('hidden');
       document.getElementById('auth-modal').classList.add('flex');
     }
@@ -452,25 +520,46 @@
       const email = document.getElementById('signup-email').value.trim().toLowerCase();
       const ign = document.getElementById('signup-ign').value.trim();
       const tag = document.getElementById('signup-tag').value.trim().toUpperCase();
+      const clanName = document.getElementById('signup-clan-name').value.trim();
+      const clanId = document.getElementById('signup-clan-id').value.trim().toUpperCase();
       const password = document.getElementById('signup-password').value;
+      const isAdmin = document.getElementById('signup-is-admin').checked;
 
-      if (AppState.usersDb.some(u => u.email === email)) {
+      if (PortalState.usersDb.some(u => u.email === email)) {
         return alert("An account with this email is already registered.");
       }
 
-      const newUser = { id: 'usr_' + Date.now(), email, ign, tag, password, role: 'Member' };
-      AppState.usersDb.push(newUser);
-      localStorage.setItem('portal_users_db', JSON.stringify(AppState.usersDb));
+      const newUser = {
+        id: 'usr_' + Date.now(),
+        email,
+        ign,
+        tag,
+        clanName,
+        clanId,
+        password,
+        role: isAdmin ? 'Admin' : 'Member'
+      };
+
+      PortalState.usersDb.push(newUser);
+      localStorage.setItem('portal_users_db', JSON.stringify(PortalState.usersDb));
 
       // Auto sign-in
-      AppState.currentUser = { id: newUser.id, email: newUser.email, ign: newUser.ign, tag: newUser.tag, role: newUser.role };
-      localStorage.setItem('portal_user', JSON.stringify(AppState.currentUser));
+      PortalState.currentUser = {
+        id: newUser.id,
+        email: newUser.email,
+        ign: newUser.ign,
+        tag: newUser.tag,
+        clanName: newUser.clanName,
+        clanId: newUser.clanId,
+        role: newUser.role
+      };
+      localStorage.setItem('portal_user', JSON.stringify(PortalState.currentUser));
 
-      alert(`Account registered! Welcome to the clan, ${ign}.`);
+      alert(`Profile created successfully! Welcome, ${newUser.ign} [${newUser.role}].`);
       document.getElementById('signup-form').reset();
       closeAuthModal();
       updateAuthUI();
-      renderMessages();
+      navigate('home');
     }
 
     function handleSignIn(e) {
@@ -478,270 +567,172 @@
       const email = document.getElementById('signin-email').value.trim().toLowerCase();
       const password = document.getElementById('signin-password').value;
 
-      const user = AppState.usersDb.find(u => u.email === email && u.password === password);
+      const user = PortalState.usersDb.find(u => u.email === email && u.password === password);
       if (!user) {
-        return alert("Invalid email address or password.");
+        return alert("Invalid email credentials or password.");
       }
 
-      AppState.currentUser = { id: user.id, email: user.email, ign: user.ign, tag: user.tag, role: user.role };
-      localStorage.setItem('portal_user', JSON.stringify(AppState.currentUser));
+      PortalState.currentUser = {
+        id: user.id,
+        email: user.email,
+        ign: user.ign,
+        tag: user.tag,
+        clanName: user.clanName,
+        clanId: user.clanId,
+        role: user.role
+      };
+      localStorage.setItem('portal_user', JSON.stringify(PortalState.currentUser));
 
       document.getElementById('signin-form').reset();
       closeAuthModal();
       updateAuthUI();
-      renderMessages();
+      navigate('home');
     }
 
     function logoutUser() {
-      AppState.currentUser = null;
+      PortalState.currentUser = null;
       localStorage.removeItem('portal_user');
       updateAuthUI();
-      renderMessages();
+      navigate('home');
     }
 
     function updateAuthUI() {
       const slot = document.getElementById('auth-header-slot');
-      const chatInput = document.getElementById('chat-text-input');
-      const chatAlert = document.getElementById('chat-auth-alert');
-      const statusRole = document.getElementById('role-switch-indicator');
+      const adminNav = document.getElementById('nav-admin');
+      const homeActionButtons = document.getElementById('home-action-buttons');
+      const roleBadge = document.getElementById('current-user-role-badge');
 
-      if (AppState.currentUser) {
+      if (PortalState.currentUser) {
+        // Show Admin link if user has Admin role
+        adminNav.classList.toggle('hidden', PortalState.currentUser.role !== 'Admin');
+
         slot.innerHTML = `
           <div class="flex items-center gap-2">
             <div class="text-right">
-              <span class="block text-xs font-bold text-white">${AppState.currentUser.ign}</span>
-              <span class="block text-[9px] font-mono text-amber-400">${AppState.currentUser.tag}</span>
+              <span class="block text-xs font-bold text-white">${escapeHTML(PortalState.currentUser.ign)}</span>
+              <span class="block text-[9px] font-mono text-amber-400">${PortalState.currentUser.role} • ${escapeHTML(PortalState.currentUser.clanName || 'Clanless')}</span>
             </div>
-            <button onclick="logoutUser()" class="p-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-rose-400 rounded-xl border border-brand-border transition" title="Log Out">
+            <button onclick="logoutUser()" class="p-2 bg-brand-surface hover:bg-slate-800 text-slate-400 hover:text-rose-400 rounded-xl border border-brand-border transition" title="Log Out">
               <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
             </button>
           </div>
         `;
-        chatInput.disabled = false;
-        chatInput.placeholder = `Message #${AppState.activeRoomId} as ${AppState.currentUser.ign}...`;
-        chatAlert.innerText = "";
-        statusRole.innerText = `Role: ${AppState.currentUser.ign} (${AppState.isOfficerMode ? 'Officer' : 'Member'})`;
+
+        if (roleBadge) {
+          roleBadge.innerText = `${PortalState.currentUser.role} • ${PortalState.currentUser.ign}`;
+        }
+
+        homeActionButtons.innerHTML = `
+          <button onclick="navigate('chat')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2">
+            <i data-lucide="messages-square" class="w-4 h-4"></i> Enter War Chat
+          </button>
+          <button onclick="navigate('join')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider border border-slate-700 transition">
+            Submit Join Petition
+          </button>
+          <button onclick="navigate('armory')" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider border border-slate-700 transition">
+            Browse Armory
+          </button>
+        `;
       } else {
+        adminNav.classList.add('hidden');
         slot.innerHTML = `
-          <button onclick="openAuthModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs uppercase tracking-wider transition">
+          <button onclick="openAuthModal('signin')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-2 rounded-xl text-xs uppercase tracking-wider transition">
             Sign In / Register
           </button>
         `;
-        chatInput.disabled = true;
-        chatInput.placeholder = "You must sign in to send messages...";
-        chatAlert.innerText = "Read-Only Mode";
-        statusRole.innerText = `Role: Guest (${AppState.isOfficerMode ? 'Officer View' : 'Standard'})`;
+
+        homeActionButtons.innerHTML = `
+          <button onclick="openAuthModal('signup')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center gap-2">
+            <i data-lucide="user-plus" class="w-4 h-4"></i> Create Account to Access
+          </button>
+        `;
       }
       lucide.createIcons();
     }
 
-    function toggleAdminPreview() {
-      AppState.isOfficerMode = !AppState.isOfficerMode;
-      localStorage.setItem('portal_officer', AppState.isOfficerMode.toString());
-      updateAuthUI();
-      alert(`Officer Mode is now ${AppState.isOfficerMode ? 'ENABLED' : 'DISABLED'}. You can review applications in the Review Desk.`);
+    // 3. Admin Merch Listing System (Zero Pre-Fab)
+    function handleCreateMerchListing(e) {
+      e.preventDefault();
+      if (PortalState.currentUser?.role !== 'Admin') return alert("Unauthorized.");
+
+      const title = document.getElementById('admin-merch-title').value.trim();
+      const price = parseFloat(document.getElementById('admin-merch-price').value);
+      const image = document.getElementById('admin-merch-image').value.trim();
+      const desc = document.getElementById('admin-merch-desc').value.trim();
+
+      const newListing = {
+        id: 'merch_' + Date.now(),
+        title,
+        price,
+        image,
+        desc,
+        listedBy: PortalState.currentUser.ign,
+        createdAt: new Date().toLocaleDateString()
+      };
+
+      PortalState.merchandise.unshift(newListing);
+      localStorage.setItem('portal_merchandise', JSON.stringify(PortalState.merchandise));
+
+      alert(`"${title}" published to the Armory!`);
+      document.getElementById('admin-merch-form').reset();
+      renderArmory();
+      navigate('armory');
     }
 
-    // 3. Multi-Room Group Chat
-    function renderRooms() {
-      const container = document.getElementById('room-list-container');
-      container.innerHTML = '';
-
-      AppState.rooms.forEach(room => {
-        const isActive = AppState.activeRoomId === room.id;
-        const btn = document.createElement('button');
-        btn.className = `w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition ${
-          isActive ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-        }`;
-        btn.innerHTML = `<i data-lucide="hash" class="w-3.5 h-3.5"></i> ${room.name}`;
-        btn.onclick = () => selectRoom(room);
-        container.appendChild(btn);
-      });
-      lucide.createIcons();
+    function removeMerchListing(id) {
+      if (PortalState.currentUser?.role !== 'Admin') return alert("Unauthorized.");
+      if (confirm("Remove this product listing from the armory?")) {
+        PortalState.merchandise = PortalState.merchandise.filter(m => m.id !== id);
+        localStorage.setItem('portal_merchandise', JSON.stringify(PortalState.merchandise));
+        renderArmory();
+      }
     }
 
-    function selectRoom(room) {
-      AppState.activeRoomId = room.id;
-      document.getElementById('active-room-display').innerHTML = `<i data-lucide="hash" class="w-4 h-4 text-amber-400"></i> ${room.name}`;
-      document.getElementById('active-room-desc').innerText = room.desc;
-      renderRooms();
-      renderMessages();
-      updateAuthUI();
-    }
+    // 4. Armory Catalog Display
+    function renderArmory() {
+      const grid = document.getElementById('armory-grid');
+      grid.innerHTML = '';
 
-    function promptNewRoom() {
-      if (!AppState.currentUser) return openAuthModal();
-      const name = prompt("Enter new room name (e.g. cwl-planning):");
-      if (!name) return;
-
-      const cleanId = name.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
-      if (AppState.rooms.some(r => r.id === cleanId)) return alert("Room already exists.");
-
-      const newRoom = { id: cleanId, name: cleanId, desc: 'Clan coordination room' };
-      AppState.rooms.push(newRoom);
-      localStorage.setItem('portal_rooms', JSON.stringify(AppState.rooms));
-      renderRooms();
-      selectRoom(newRoom);
-    }
-
-    function renderMessages() {
-      const container = document.getElementById('messages-container');
-      container.innerHTML = '';
-
-      const roomMessages = AppState.messages.filter(m => m.roomId === AppState.activeRoomId);
-
-      if (roomMessages.length === 0) {
-        container.innerHTML = `
-          <div class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
-            <i data-lucide="message-square" class="w-8 h-8 mb-2 opacity-50"></i>
-            <p class="text-xs font-bold text-slate-400">No transmissions in #${AppState.activeRoomId}</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">Be the first chieftain to dispatch a message.</p>
+      if (PortalState.merchandise.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center bg-brand-card border border-brand-border rounded-2xl p-8 space-y-3">
+            <i data-lucide="package-open" class="w-10 h-10 text-slate-500 mx-auto"></i>
+            <h3 class="text-sm font-bold text-white">Armory is Currently Empty</h3>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">No merchandise has been published by clan leadership yet.</p>
+            ${PortalState.currentUser?.role === 'Admin' ? `
+              <button onclick="navigate('admin')" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl transition">
+                Create First Product Listing
+              </button>
+            ` : ''}
           </div>
         `;
         lucide.createIcons();
         return;
       }
 
-      roomMessages.forEach(msg => {
-        const isMe = AppState.currentUser && AppState.currentUser.id === msg.userId;
-        const row = document.createElement('div');
-        row.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
-        row.innerHTML = `
-          <div class="flex items-center gap-1.5 mb-1 text-[11px]">
-            <span class="font-bold ${isMe ? 'text-amber-400' : 'text-slate-200'}">${msg.ign}</span>
-            <span class="text-[9px] font-mono text-slate-500">${msg.tag}</span>
-            <span class="text-[10px] text-slate-500">${msg.time}</span>
-          </div>
-          <div class="px-3.5 py-2 rounded-2xl max-w-md text-xs ${
-            isMe ? 'bg-amber-500 text-slate-950 font-semibold rounded-tr-none' : 'bg-slate-800 text-slate-100 rounded-tl-none border border-slate-700'
-          }">
-            ${escapeHTML(msg.text)}
-          </div>
-        `;
-        container.appendChild(row);
-      });
-      container.scrollTop = container.scrollHeight;
-      lucide.createIcons();
-    }
-
-    function handleMessageSubmit(e) {
-      e.preventDefault();
-      if (!AppState.currentUser) return openAuthModal();
-
-      const input = document.getElementById('chat-text-input');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const newMsg = {
-        id: 'msg_' + Date.now(),
-        roomId: AppState.activeRoomId,
-        userId: AppState.currentUser.id,
-        ign: AppState.currentUser.ign,
-        tag: AppState.currentUser.tag,
-        text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      AppState.messages.push(newMsg);
-      localStorage.setItem('portal_messages', JSON.stringify(AppState.messages));
-      input.value = '';
-      renderMessages();
-    }
-
-    // 4. Join Petition System
-    function handleJoinPetitionSubmit(e) {
-      e.preventDefault();
-      const petition = {
-        id: 'pet_' + Date.now(),
-        ign: document.getElementById('petition-ign').value.trim(),
-        tag: document.getElementById('petition-tag').value.trim().toUpperCase(),
-        town_hall: parseInt(document.getElementById('petition-th').value),
-        war_stars: parseInt(document.getElementById('petition-stars').value),
-        specialty: document.getElementById('petition-spec').value,
-        statement: document.getElementById('petition-statement').value.trim(),
-        status: 'pending',
-        submittedAt: new Date().toLocaleDateString()
-      };
-
-      AppState.joinPetitions.unshift(petition);
-      localStorage.setItem('portal_petitions', JSON.stringify(AppState.joinPetitions));
-
-      alert("Petition recorded! The leadership council will evaluate your statistics on the Review Desk.");
-      document.getElementById('join-petition-form').reset();
-      renderPetitions();
-      switchView('admin');
-    }
-
-    function renderPetitions() {
-      const tbody = document.getElementById('petitions-table-body');
-      tbody.innerHTML = '';
-
-      if (AppState.joinPetitions.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 font-sans text-xs">No pending applications in queue.</td></tr>`;
-        return;
-      }
-
-      AppState.joinPetitions.forEach(p => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-900/50";
-        tr.innerHTML = `
-          <td class="p-3.5 font-bold text-white">${escapeHTML(p.ign)} <span class="block text-[10px] text-slate-500">${escapeHTML(p.tag)}</span></td>
-          <td class="p-3.5">TH${p.town_hall}</td>
-          <td class="p-3.5 text-amber-400 font-bold">${p.war_stars}</td>
-          <td class="p-3.5 text-slate-300 text-[11px] font-sans">${escapeHTML(p.specialty)}</td>
-          <td class="p-3.5">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
-              p.status === 'approved' ? 'bg-emerald-500/20 text-emerald-400' :
-              p.status === 'rejected' ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400'
-            }">${p.status.toUpperCase()}</span>
-          </td>
-          <td class="p-3.5 text-right space-x-1">
-            <button onclick="setPetitionStatus('${p.id}', 'approved')" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 rounded text-[10px] transition">APPROVE</button>
-            <button onclick="setPetitionStatus('${p.id}', 'rejected')" class="px-2.5 py-1 bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 rounded text-[10px] transition">DECLINE</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function setPetitionStatus(id, status) {
-      const pet = AppState.joinPetitions.find(p => p.id === id);
-      if (pet) {
-        pet.status = status;
-        localStorage.setItem('portal_petitions', JSON.stringify(AppState.joinPetitions));
-        renderPetitions();
-      }
-    }
-
-    function clearAllPetitions() {
-      if (confirm("Purge all petition records?")) {
-        AppState.joinPetitions = [];
-        localStorage.removeItem('portal_petitions');
-        renderPetitions();
-      }
-    }
-
-    // 5. Armory Merchandise & Cart Flow
-    function renderArmory() {
-      const grid = document.getElementById('armory-grid');
-      grid.innerHTML = '';
-
-      AppState.merchandise.forEach(item => {
+      PortalState.merchandise.forEach(item => {
         const card = document.createElement('div');
         card.className = "bg-brand-card border border-brand-border rounded-2xl overflow-hidden flex flex-col";
         card.innerHTML = `
           <div class="h-48 bg-slate-950 flex items-center justify-center p-4">
-            <img src="${item.image}" alt="${item.title}" class="max-h-full object-contain">
+            <img src="${escapeHTML(item.image)}" alt="${escapeHTML(item.title)}" class="max-h-full object-contain" onerror="this.src='https://placehold.co/400x300/1e293b/white?text=No+Preview'">
           </div>
           <div class="p-4 flex-1 flex flex-col justify-between">
             <div>
-              <h4 class="font-bold text-white text-sm">${item.title}</h4>
-              <p class="text-xs text-slate-400 mt-1 line-clamp-2">${item.desc}</p>
+              <div class="flex justify-between items-start gap-2">
+                <h4 class="font-bold text-white text-sm">${escapeHTML(item.title)}</h4>
+                ${PortalState.currentUser?.role === 'Admin' ? `
+                  <button onclick="removeMerchListing('${item.id}')" class="text-rose-400 hover:text-rose-300 p-1" title="Delete Listing">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  </button>
+                ` : ''}
+              </div>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">${escapeHTML(item.desc)}</p>
             </div>
             <div class="mt-4 flex items-center justify-between">
               <span class="font-mono text-sm font-bold text-amber-400">$${item.price.toFixed(2)}</span>
               <button onclick="addToCart('${item.id}')" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition flex items-center gap-1">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Equip
+                <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i> Equip
               </button>
             </div>
           </div>
@@ -751,18 +742,23 @@
       lucide.createIcons();
     }
 
+    // 5. Cart Logic
     function toggleCartDrawer() {
       document.getElementById('cart-drawer').classList.toggle('translate-x-full');
     }
 
     function addToCart(id) {
-      const item = AppState.merchandise.find(m => m.id === id);
-      const match = AppState.cart.find(c => c.id === id);
-      if (match) match.qty += 1;
-      else AppState.cart.push({ id: item.id, title: item.title, price: item.price, qty: 1 });
+      if (!PortalState.currentUser) return showLockedScreen();
+      const item = PortalState.merchandise.find(m => m.id === id);
+      if (!item) return;
 
-      localStorage.setItem('portal_cart', JSON.stringify(AppState.cart));
+      const existing = PortalState.cart.find(c => c.id === id);
+      if (existing) existing.qty += 1;
+      else PortalState.cart.push({ id: item.id, title: item.title, price: item.price, qty: 1 });
+
+      localStorage.setItem('portal_cart', JSON.stringify(PortalState.cart));
       renderCart();
+      toggleCartDrawer();
     }
 
     function renderCart() {
@@ -771,17 +767,17 @@
       let sum = 0;
       let count = 0;
 
-      if (AppState.cart.length === 0) {
-        container.innerHTML = `<p class="text-slate-500 text-xs text-center py-8 font-mono">BAG IS CURRENTLY EMPTY</p>`;
+      if (PortalState.cart.length === 0) {
+        container.innerHTML = `<p class="text-slate-500 text-xs text-center py-8 font-mono">REQUISITION BAG EMPTY</p>`;
       } else {
-        AppState.cart.forEach(c => {
+        PortalState.cart.forEach(c => {
           sum += c.price * c.qty;
           count += c.qty;
           const row = document.createElement('div');
           row.className = "flex justify-between items-center text-xs bg-slate-950 p-2.5 rounded-xl border border-brand-border font-mono";
           row.innerHTML = `
             <div>
-              <span class="font-bold text-white block">${c.title}</span>
+              <span class="font-bold text-white block">${escapeHTML(c.title)}</span>
               <span class="text-slate-400 text-[10px]">$${c.price.toFixed(2)} x ${c.qty}</span>
             </div>
             <button onclick="removeFromCart('${c.id}')" class="text-rose-400 hover:text-rose-300">
@@ -798,20 +794,209 @@
     }
 
     function removeFromCart(id) {
-      AppState.cart = AppState.cart.filter(c => c.id !== id);
-      localStorage.setItem('portal_cart', JSON.stringify(AppState.cart));
+      PortalState.cart = PortalState.cart.filter(c => c.id !== id);
+      localStorage.setItem('portal_cart', JSON.stringify(PortalState.cart));
       renderCart();
     }
 
     function checkoutCart() {
-      if (AppState.cart.length === 0) return alert("Your armory bag is empty.");
-      if (!AppState.currentUser) return openAuthModal();
+      if (PortalState.cart.length === 0) return alert("Your requisition bag is empty.");
+      if (!PortalState.currentUser) return showLockedScreen();
 
-      alert(`Order confirmed for ${AppState.currentUser.ign}! A receipt has been dispatched to ${AppState.currentUser.email}.`);
-      AppState.cart = [];
+      alert(`Order confirmed for ${PortalState.currentUser.ign}! A confirmation receipt has been sent to ${PortalState.currentUser.email}.`);
+      PortalState.cart = [];
       localStorage.removeItem('portal_cart');
       renderCart();
       toggleCartDrawer();
+    }
+
+    // 6. Multi-Room Group Chat
+    function renderRooms() {
+      const container = document.getElementById('room-list-container');
+      container.innerHTML = '';
+
+      PortalState.rooms.forEach(room => {
+        const isActive = PortalState.activeRoomId === room.id;
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition ${
+          isActive ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+        }`;
+        btn.innerHTML = `<i data-lucide="hash" class="w-3.5 h-3.5"></i> ${escapeHTML(room.name)}`;
+        btn.onclick = () => selectRoom(room);
+        container.appendChild(btn);
+      });
+      lucide.createIcons();
+    }
+
+    function selectRoom(room) {
+      PortalState.activeRoomId = room.id;
+      document.getElementById('active-room-display').innerHTML = `<i data-lucide="hash" class="w-4 h-4 text-amber-400"></i> ${escapeHTML(room.name)}`;
+      document.getElementById('active-room-desc').innerText = room.desc;
+      renderRooms();
+      renderMessages();
+    }
+
+    function promptNewRoom() {
+      if (!PortalState.currentUser) return showLockedScreen();
+      const name = prompt("Enter new room channel name (e.g. cwl-targets):");
+      if (!name) return;
+
+      const cleanId = name.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+      if (PortalState.rooms.some(r => r.id === cleanId)) return alert("Room already exists.");
+
+      const newRoom = { id: cleanId, name: cleanId, desc: 'Clan coordination channel' };
+      PortalState.rooms.push(newRoom);
+      localStorage.setItem('portal_rooms', JSON.stringify(PortalState.rooms));
+      renderRooms();
+      selectRoom(newRoom);
+    }
+
+    function renderMessages() {
+      const container = document.getElementById('messages-container');
+      container.innerHTML = '';
+
+      const roomMessages = PortalState.messages.filter(m => m.roomId === PortalState.activeRoomId);
+
+      if (roomMessages.length === 0) {
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
+            <i data-lucide="message-square" class="w-8 h-8 mb-2 opacity-40"></i>
+            <p class="text-xs font-bold text-slate-400">No transmissions in #${escapeHTML(PortalState.activeRoomId)}</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Send a transmission to start coordination.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      roomMessages.forEach(msg => {
+        const isMe = PortalState.currentUser && PortalState.currentUser.id === msg.userId;
+        const row = document.createElement('div');
+        row.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
+        row.innerHTML = `
+          <div class="flex items-center gap-1.5 mb-1 text-[11px]">
+            <span class="font-bold ${isMe ? 'text-amber-400' : 'text-slate-200'}">${escapeHTML(msg.ign)}</span>
+            <span class="text-[9px] font-mono text-slate-500">${escapeHTML(msg.tag)} • ${escapeHTML(msg.clanName || '')}</span>
+            <span class="text-[9px] text-slate-500">${msg.time}</span>
+          </div>
+          <div class="px-3.5 py-2 rounded-2xl max-w-md text-xs ${
+            isMe ? 'bg-amber-500 text-slate-950 font-semibold rounded-tr-none' : 'bg-slate-800 text-slate-100 rounded-tl-none border border-brand-border'
+          }">
+            ${escapeHTML(msg.text)}
+          </div>
+        `;
+        container.appendChild(row);
+      });
+      container.scrollTop = container.scrollHeight;
+      lucide.createIcons();
+    }
+
+    function handleMessageSubmit(e) {
+      e.preventDefault();
+      if (!PortalState.currentUser) return showLockedScreen();
+
+      const input = document.getElementById('chat-text-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const newMsg = {
+        id: 'msg_' + Date.now(),
+        roomId: PortalState.activeRoomId,
+        userId: PortalState.currentUser.id,
+        ign: PortalState.currentUser.ign,
+        tag: PortalState.currentUser.tag,
+        clanName: PortalState.currentUser.clanName,
+        text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      PortalState.messages.push(newMsg);
+      localStorage.setItem('portal_messages', JSON.stringify(PortalState.messages));
+      input.value = '';
+      renderMessages();
+    }
+
+    // 7. Join Petitions & Admin Review
+    function handleJoinPetitionSubmit(e) {
+      e.preventDefault();
+      if (!PortalState.currentUser) return showLockedScreen();
+
+      const petition = {
+        id: 'pet_' + Date.now(),
+        userId: PortalState.currentUser.id,
+        ign: document.getElementById('petition-ign').value.trim(),
+        tag: document.getElementById('petition-tag').value.trim().toUpperCase(),
+        currentClan: document.getElementById('petition-current-clan').value.trim(),
+        currentClanTag: document.getElementById('petition-current-clan-tag').value.trim().toUpperCase(),
+        town_hall: parseInt(document.getElementById('petition-th').value),
+        war_stars: parseInt(document.getElementById('petition-stars').value),
+        specialty: document.getElementById('petition-spec').value,
+        statement: document.getElementById('petition-statement').value.trim(),
+        status: 'pending',
+        submittedAt: new Date().toLocaleDateString()
+      };
+
+      PortalState.petitions.unshift(petition);
+      localStorage.setItem('portal_petitions', JSON.stringify(PortalState.petitions));
+
+      alert("Petition recorded and submitted to clan leadership for review!");
+      document.getElementById('join-petition-form').reset();
+      renderPetitions();
+      navigate('home');
+    }
+
+    function renderPetitions() {
+      const tbody = document.getElementById('admin-petitions-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (PortalState.petitions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 font-sans text-xs">No pending enlistment petitions in queue.</td></tr>`;
+        return;
+      }
+
+      PortalState.petitions.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/50";
+        tr.innerHTML = `
+          <td class="p-3.5 font-bold text-white">
+            ${escapeHTML(p.ign)} <span class="block text-[10px] text-slate-500">${escapeHTML(p.tag)}</span>
+          </td>
+          <td class="p-3.5 text-slate-300">
+            ${escapeHTML(p.currentClan)} <span class="block text-[10px] text-slate-500">${escapeHTML(p.currentClanTag)}</span>
+          </td>
+          <td class="p-3.5">TH${p.town_hall}</td>
+          <td class="p-3.5 text-amber-400 font-bold">${p.war_stars}</td>
+          <td class="p-3.5">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+              p.status === 'approved' ? 'bg-emerald-500/20 text-emerald-400' :
+              p.status === 'rejected' ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400'
+            }">${p.status.toUpperCase()}</span>
+          </td>
+          <td class="p-3.5 text-right space-x-1">
+            <button onclick="updatePetitionStatus('${p.id}', 'approved')" class="px-2.5 py-1 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 rounded text-[10px] transition">APPROVE</button>
+            <button onclick="updatePetitionStatus('${p.id}', 'rejected')" class="px-2.5 py-1 bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 rounded text-[10px] transition">DECLINE</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updatePetitionStatus(id, status) {
+      if (PortalState.currentUser?.role !== 'Admin') return alert("Unauthorized.");
+      const pet = PortalState.petitions.find(p => p.id === id);
+      if (pet) {
+        pet.status = status;
+        localStorage.setItem('portal_petitions', JSON.stringify(PortalState.petitions));
+        renderPetitions();
+      }
+    }
+
+    function clearPetitions() {
+      if (PortalState.currentUser?.role !== 'Admin') return alert("Unauthorized.");
+      PortalState.petitions = PortalState.petitions.filter(p => p.status === 'pending');
+      localStorage.setItem('portal_petitions', JSON.stringify(PortalState.petitions));
+      renderPetitions();
     }
 
     function escapeHTML(str) {
